@@ -1,6 +1,7 @@
 var patterns = require("../lib");
 var pattern = patterns.pattern;
 var assert = require("assert");
+var adt = require("adt");
 
 suite("Patterns", function () {
   var func;
@@ -116,6 +117,23 @@ suite("Patterns", function () {
   var arr = [1, 2, 3];
   testPattern("x@[head, tail...]", arr, function (x, head, tail) {
     return x === arr && head === 1 && tail.length === 2;
+  });
+
+  // adt.js types
+  // ------------
+
+  var Foo = adt.data({
+    Bar: adt.record("a", "b", "c"),
+    Baz: adt.record("d")
+  });
+
+  var bar = Foo.Bar(1, 2, 3);
+  var baz = Foo.Baz(42);
+  var bar2 = Foo.Bar(baz, 2, 3);
+
+  testPattern("Bar(a, 2, Number)", bar);
+  testPattern("Bar(a@Baz(b), _, _)", bar2, function (a, b) {
+    return a === baz && b === 42;
   });
 
 });
