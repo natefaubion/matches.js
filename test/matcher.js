@@ -2,7 +2,6 @@ var Matcher = require("../lib/matcher").Matcher;
 var assert  = require("assert");
 
 suite("Matcher", function () {
-
   var count, chain;
 
   function _ () {}
