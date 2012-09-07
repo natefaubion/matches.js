@@ -1,0 +1,19 @@
+{
+  "name": "matches",
+  "version": "0.0.0",
+  "author": "Nathan Faubion <nathan@n-son.com>",
+  "description": "Powerful pattern matching for Javascript",
+  "scripts": {
+    "test": "mocha -u tdd"
+  },
+  "main": "./lib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/natefaubion/matches.js.git" 
+  },
+  "keywords": ["matching", "patterns", "pattern", "match"],
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "license": "MIT"
+}
