@@ -1,5 +1,5 @@
-var patterns = require("../lib");
-var pattern = patterns.pattern;
+var matches = require("../lib");
+var pattern = matches.pattern;
 var assert = require("assert");
 var adt = require("adt");
 
@@ -76,15 +76,30 @@ suite("Patterns", function () {
   });
 
   testPattern("[x..., y, z]", [1, 1, 1, 2, 3], function (x, y, z) {
-    return x.length === 3 && y === 2 && z === 3;
+    return x.length === 3
+        && x[0] === 1
+        && x[1] === 1
+        && x[2] === 1
+        && y === 2
+        && z === 3;
   });
 
   testPattern("[x, y..., z]", [1, 2, 2, 2, 3], function (x, y, z) {
-    return y.length === 3 && x === 1 && z === 3;
+    return y.length === 3 
+        && y[0] === 2
+        && y[1] === 2
+        && y[2] === 2
+        && x === 1
+        && z === 3;
   });
 
   testPattern("[x, y, z...]", [1, 2, 3, 3, 3], function (x, y, z) {
-    return z.length === 3 && x === 1 && y === 2;
+    return z.length === 3 
+        && z[0] === 3
+        && z[1] === 3
+        && z[2] === 3
+        && x === 1
+        && y === 2;
   });
 
   testPattern("[...]", [1, 2, 3], function (a) {
