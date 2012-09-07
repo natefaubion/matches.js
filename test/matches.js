@@ -110,4 +110,12 @@ suite("Matches", function () {
     return x === 2; 
   });
 
+  // Captures
+  // --------
+
+  var arr = [1, 2, 3];
+  testPattern("x@[head, tail...]", arr, function (x, head, tail) {
+    return x === arr && head === 1 && tail.length === 2;
+  });
+
 });
