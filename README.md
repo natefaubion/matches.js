@@ -1,4 +1,4 @@
-')tches.js
+matches.js
 ==========
 
 Matches.js brings the power and expressiveness of pattern matching to 
@@ -104,7 +104,7 @@ mychain(5);
 
 Separate matches for multiple arguments with a comma. Since you can pass any
 number of arguments to functions in Javascript, Matches.js is not strict and
-will happily combine patterns for varying number of arguments.
+will happily combine patterns for varying numbers of arguments.
 
 ```js
 var myfn = pattern({
@@ -235,7 +235,7 @@ var myfn = pattern({
   // Empty object
   '{}': function () { ... },
 
-  // Check that an object has only two keys, and pass to the function
+  // Check that an object has only two keys 'x' and 'y', and pass to the function
   '{x, y}': function (x, y) { ... },
 
   // Check that an object has a key that contains an array
@@ -286,3 +286,5 @@ var myfn = pattern({
   'Node(val, Node(42, _, _), Empty)': function (val) { ... }
 });
 ```
+
+Find out more about adt.js: https://github.com/natefaubion/adt.js
