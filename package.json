@@ -1,6 +1,6 @@
 {
   "name": "matches",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Nathan Faubion <nathan@n-son.com>",
   "description": "Powerful pattern matching for Javascript",
   "scripts": {
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/natefaubion/matches.js.git" 
   },
-  "keywords": ["matching", "patterns", "pattern", "match"],
+  "keywords": ["matching", "patterns", "pattern", "match", "functional"],
   "devDependencies": {
     "mocha": "*"
   },
