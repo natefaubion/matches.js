@@ -32,7 +32,10 @@ suite("Patterns", function () {
 
   testPattern("null", null);
   testPattern("undefined", undefined);
+
   testPattern("42", 42);
+  testPattern("12.6", 12.6);
+  testPattern("1e+42", 1e+42);
 
   testPattern("true", true);
   testPattern("false", false);
