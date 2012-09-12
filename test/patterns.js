@@ -129,6 +129,34 @@ suite("Patterns", function () {
     return x === 2; 
   });
 
+  testPattern("{a, b:x}", {a: 1, b: 2}, function (a, x) {
+    return a === 1 && x === 2;
+  });
+
+  testPattern("{a, b, ...}", {a: 1, b: 2, c: 3}, function (a, b) {
+    return a === 1 && b === 2;
+  });
+
+  testPattern("{a, b, c...}", {a: 1, b: 2, c: 3}, function (a, b, c) {
+    return a === 1 
+        && b === 2
+        && c.c === 3
+        && c.a === undefined
+        && c.b === undefined;
+  });
+
+  testPattern("{a:x, b:y, ...}", {a: 1, b: 2, c: 3}, function (x, y) {
+    return x === 1 && y === 2;
+  });
+
+  testPattern("{a:x, b:y, c...}", {a: 1, b: 2, c: 3}, function (x, y, c) {
+    return x === 1 
+        && y === 2
+        && c.c === 3
+        && c.a === undefined
+        && c.b === undefined;
+  });
+
   // Captures
   // --------
 
