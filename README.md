@@ -9,134 +9,20 @@ Install
 
 `npm install matches`
 
-Usage
------
-
-Matches.js exports one function, `pattern`.
-
 ```js
 var pattern = require("matches").pattern;
-```
-
-### pattern(patternObj)
-
-The simplest way is to give it an object with the keys being patterns, and the
-values being functions. Each pattern will be tried in order until a match is
-found.
-
-```js
-var arrayElems = pattern({
-  '[]': function () { 
-    return "This array is empty."; 
+var mymap = pattern({
+  '_, []' : function () { 
+    return [];
   },
-  '[x]': function (x) { 
-    return "This array has one element: " + x; 
-  },
-  '[x, y]': function (x, y) { 
-    return "This array has two elements: " + x + " and " + y;
-  },
-  '[x, y, ...]': function (x, y) {
-    return "This array is long. The first two elements are: " + x + " and " + y;
+  'f, [x, xs...]' : function (f, x, xs) {
+    return [f(x)].concat(mymap(f, xs));
   }
 });
 
-arrayElems([1, 2, 3]);
+// [2, 4, 6, 8]
+mymap(function (x) { return x * 2; }, [1, 2, 3, 4]);
 ```
-
-### pattern(patternStr, successFn)
-
-You can create individual pattern and function pairs.
-
-```js
-var emptyArray = pattern('[]', function () { return "Empty array" });
-
-// "Empty array"
-emptyArray([]);
-
-// TypeError: "All patterns exhausted"
-emptyArray(12);
-```
-
-### pattern(patternFn, successFn)
-
-You can also create your own custom pattern functions. The `patternFn` takes
-an array of arguments, and should return `false` for no match, or a new array
-of arguments to forward on to the `successFn`.
-
-```js
-var greater42 = function (args) {
-  if (args[0] >= 42) return [args[0]];
-  return false;
-};
-
-var customPattern = pattern(greater42, function (x) {
-  console.log(x);
-});
-
-// Logs 54
-customPattern(54);
-
-// TypeError: "All patterns exhausted"
-customPattern(12);
-```
-
-### Combinators
-
-You can combine any of these methods to create unique match chains using the
-`alt` combinator.
-
-```js
-
-var wildcard = pattern('_', function () { return "No matches."; });
-var mychain = pattern('1', function () { return "One"; })
-  .alt({
-    '2': function () { return "Two"; },
-    '3': function () { return "Three"; }
-  })
-  .alt(wildcard);
-
-// 'One'
-mychain(1);
-
-// 'Two'
-mychain(2);
-
-// 'No matches.'
-mychain(5);
-```
-
-### Multiple Arguments
-
-Separate matches for multiple arguments with a comma. Since you can pass any
-number of arguments to functions in Javascript, Matches.js is not strict and
-will happily combine patterns for varying numbers of arguments.
-
-```js
-var myfn = pattern({
-  // Matches on the first three arguments. If more are passed, they are ignored.
-  '1, "foo", [a, ...]': function (a) { return a; },
-
-  // Matches on the first two arguments, ignoring the rest
-  'a, fn@Function': function (a, fn) { return fn(a); },
-
-  // Matches anything
-  '_': function () { return null; }
-});
-
-// 12
-myfn(6, function (x) { return x * 2; }, "foo", "bar");
-
-// null
-myfn(1, 2, 3, 4);
-```
-
-### Performance
-
-Pattern strings are compiled to pure Javascript functions and then cached. So
-beyond initial creation for the first instance of a pattern string, there is
-very little overhead. Unless you programmatically create dynamic patterns, you
-should only see a slight hit at the start of your application as the patterns
-are compiled. Benchmarks coming soon.
 
 Patterns
 --------
@@ -298,3 +184,132 @@ var myfn = pattern({
 ```
 
 Find out more about adt.js: https://github.com/natefaubion/adt.js
+
+Usage
+-----
+
+Matches.js exports one function, `pattern`.
+
+```js
+var pattern = require("matches").pattern;
+```
+
+### pattern(patternObj)
+
+The simplest way is to give it an object with the keys being patterns, and the
+values being functions. Each pattern will be tried in order until a match is
+found.
+
+```js
+var arrayElems = pattern({
+  '[]': function () { 
+    return "This array is empty."; 
+  },
+  '[x]': function (x) { 
+    return "This array has one element: " + x; 
+  },
+  '[x, y]': function (x, y) { 
+    return "This array has two elements: " + x + " and " + y;
+  },
+  '[x, y, ...]': function (x, y) {
+    return "This array is long. The first two elements are: " + x + " and " + y;
+  }
+});
+
+arrayElems([1, 2, 3]);
+```
+
+### pattern(patternStr, successFn)
+
+You can create individual pattern and function pairs.
+
+```js
+var emptyArray = pattern('[]', function () { return "Empty array" });
+
+// "Empty array"
+emptyArray([]);
+
+// TypeError: "All patterns exhausted"
+emptyArray(12);
+```
+
+### pattern(patternFn, successFn)
+
+You can also create your own custom pattern functions. The `patternFn` takes
+an array of arguments, and should return `false` for no match, or a new array
+of arguments to forward on to the `successFn`.
+
+```js
+var greater42 = function (args) {
+  if (args[0] >= 42) return [args[0]];
+  return false;
+};
+
+var customPattern = pattern(greater42, function (x) {
+  console.log(x);
+});
+
+// Logs 54
+customPattern(54);
+
+// TypeError: "All patterns exhausted"
+customPattern(12);
+```
+
+### Combinators
+
+You can combine any of these methods to create unique match chains using the
+`alt` combinator.
+
+```js
+
+var wildcard = pattern('_', function () { return "No matches."; });
+var mychain = pattern('1', function () { return "One"; })
+  .alt({
+    '2': function () { return "Two"; },
+    '3': function () { return "Three"; }
+  })
+  .alt(wildcard);
+
+// 'One'
+mychain(1);
+
+// 'Two'
+mychain(2);
+
+// 'No matches.'
+mychain(5);
+```
+
+### Multiple Arguments
+
+Separate matches for multiple arguments with a comma. Since you can pass any
+number of arguments to functions in Javascript, Matches.js is not strict and
+will happily combine patterns for varying numbers of arguments.
+
+```js
+var myfn = pattern({
+  // Matches on the first three arguments. If more are passed, they are ignored.
+  '1, "foo", [a, ...]': function (a) { return a; },
+
+  // Matches on the first two arguments, ignoring the rest
+  'a, fn@Function': function (a, fn) { return fn(a); },
+
+  // Matches anything
+  '_': function () { return null; }
+});
+
+// 12
+myfn(6, function (x) { return x * 2; }, "foo", "bar");
+
+// null
+myfn(1, 2, 3, 4);
+```
+
+### Performance
+
+Pattern strings are compiled to pure Javascript functions and then cached. So
+beyond initial creation for the first instance of a pattern string, there is
+very little overhead. Unless you programmatically create dynamic patterns, you
+should only see a slight hit at the start of your application as the patterns
+are compiled. Benchmarks coming soon.
