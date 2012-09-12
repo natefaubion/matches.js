@@ -4,6 +4,11 @@ matches.js
 Matches.js brings the power and expressiveness of pattern matching to 
 Javascript.
 
+Install
+-------
+
+`npm install matches`
+
 Usage
 -----
 
