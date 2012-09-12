@@ -157,6 +157,22 @@ suite("Patterns", function () {
         && c.b === undefined;
   });
 
+  testPattern("{c..., a:x, b:y}", {a: 1, b: 2, c: 3}, function (c, x, y) {
+    return x === 1 
+        && y === 2
+        && c.c === 3
+        && c.a === undefined
+        && c.b === undefined;
+  });
+  
+  testPattern("{a:x, c..., b:y}", {a: 1, b: 2, c: 3}, function (x, c, y) {
+    return x === 1 
+        && y === 2
+        && c.c === 3
+        && c.a === undefined
+        && c.b === undefined;
+  });
+
   // Captures
   // --------
 
