@@ -1,6 +1,6 @@
 {
   "name": "matches",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Nathan Faubion <nathan@n-son.com>",
   "description": "Powerful pattern matching for Javascript",
   "scripts": {
