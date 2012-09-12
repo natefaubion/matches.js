@@ -227,8 +227,7 @@ var myfn = pattern({
 
 ### Objects
 
-Matches.js currently supports strict object comparison, meaning it will match
-if the object contains the specified keys and no others.
+Like with an array, you can match on an entire object, or just a few keys.
 
 ```js
 var myfn = pattern({
@@ -238,8 +237,14 @@ var myfn = pattern({
   // Check that an object has only two keys 'x' and 'y', and pass to the function
   '{x, y}': function (x, y) { ... },
 
-  // Check that an object has a key that contains an array
-  '{children: [a, b, ...], other: _}': function (a, b) { ... }
+  // Check that an object has a key 'children' that contains an array
+  '{children: [a, b], ...}': function (a, b) { ... },
+
+  // Match on two keys, 'x' and 'y' and copy the rest to another object
+  '{x: a@Number, y: b@Number, c...}': function (a, b, c) { ... },
+
+  // Make a shallow clone of an object
+  '{clone...}': function (clone) { ... }
 })
 ```
 
