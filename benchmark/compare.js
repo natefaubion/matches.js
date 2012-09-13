@@ -71,6 +71,9 @@ suite.on("complete", function (e) {
   var handwritten = this['1'].times;
   var diff;
 
+  console.log("Matches.js:", (matches.period * 1000 * 1000).toFixed(1) + "µs");
+  console.log("Handwritten:", (handwritten.period * 1000 * 1000).toFixed(1) + "µs");
+
   if (matches.period > handwritten.period) {
     diff = (matches.period / handwritten.period).toFixed(1);
     console.log("Matches.js is " + diff + "x slower than hand optimized.");
