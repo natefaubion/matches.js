@@ -313,4 +313,6 @@ in general, they are quite fast.
 
 On a 2GHz core, average compilation time is around .12ms for a pattern
 comprised of 5-6 sub-patterns. Pattern matched functions are around 3-4x slower
-than an equivalent hand-optimized function.
+to dispatch than an equivalent hand-optimized function that does similar
+type-checking. Keep in mind, that time is measured in the single microseconds 
+(1µs vs 3µs).
