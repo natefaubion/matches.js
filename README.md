@@ -308,8 +308,9 @@ myfn(1, 2, 3, 4);
 
 ### Performance
 
-Pattern strings are compiled to pure Javascript functions and then cached. So
-beyond initial creation for the first instance of a pattern string, there is
-very little overhead. Unless you programmatically create dynamic patterns, you
-should only see a slight hit at the start of your application as the patterns
-are compiled. Benchmarks coming soon.
+Pattern strings are compiled to pure Javascript functions and then cached, so
+in general, they are quite fast.
+
+On a 2GHz core, average compilation time is around .12ms for a pattern
+comprised of 5-6 sub-patterns. Pattern matched functions are around 3-4x slower
+than an equivalent hand-optimized function.
