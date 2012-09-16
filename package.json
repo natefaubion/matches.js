@@ -16,7 +16,8 @@
     "adt": "*",
     "mocha": "*",
     "pegjs": "0.7.x",
-    "benchmark": "1.0.x"
+    "benchmark": "1.0.x",
+    "uglify-js": "1.3.x"
   },
   "license": "MIT"
 }
