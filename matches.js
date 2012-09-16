@@ -3456,9 +3456,6 @@
 
   require.modules['./matches'] = (function () {
     var module = {exports: {}}, exports = module.exports;
-    // patterns.js : Powerful pattern matching for Javascript
-    // Nathan Faubion <nathan@n-son.com>
-    
     var parser = require("./parser");
     var compiler = require("./compiler");
     var Matcher = require("./matcher").Matcher;
