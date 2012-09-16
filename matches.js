@@ -2032,8 +2032,8 @@
               pos = pos1;
             }
             if (result0 !== null) {
-              result0 = (function(offset, char) {
-                  return char;
+              result0 = (function(offset, char_) {
+                  return char_;
                 })(pos0, result0[1]);
             }
             if (result0 === null) {
@@ -2123,8 +2123,8 @@
               pos = pos1;
             }
             if (result0 !== null) {
-              result0 = (function(offset, char) {
-                  return char;
+              result0 = (function(offset, char_) {
+                  return char_;
                 })(pos0, result0[1]);
             }
             if (result0 === null) {
@@ -2354,8 +2354,8 @@
               }
             }
             if (result0 !== null) {
-              result0 = (function(offset, char) {
-                  return char
+              result0 = (function(offset, char_) {
+                  return char_
                     .replace("b", "\b")
                     .replace("f", "\f")
                     .replace("n", "\n")
@@ -2399,8 +2399,8 @@
               pos = pos1;
             }
             if (result0 !== null) {
-              result0 = (function(offset, char) {
-                  return char;
+              result0 = (function(offset, char_) {
+                  return char_;
                 })(pos0, result0[1]);
             }
             if (result0 === null) {
@@ -2482,8 +2482,8 @@
               pos = pos1;
             }
             if (result0 !== null) {
-              result0 = (function(offset, int, frac, exp) {
-                  return int + frac + exp;
+              result0 = (function(offset, int_, frac, exp) {
+                  return int_ + frac + exp;
                 })(pos0, result0[0], result0[1], result0[2]);
             }
             if (result0 === null) {
@@ -2506,8 +2506,8 @@
                 pos = pos1;
               }
               if (result0 !== null) {
-                result0 = (function(offset, int, frac) {
-                    return int + frac;
+                result0 = (function(offset, int_, frac) {
+                    return int_ + frac;
                   })(pos0, result0[0], result0[1]);
               }
               if (result0 === null) {
@@ -2530,8 +2530,8 @@
                   pos = pos1;
                 }
                 if (result0 !== null) {
-                  result0 = (function(offset, int, exp) {
-                      return int + exp;
+                  result0 = (function(offset, int_, exp) {
+                      return int_ + exp;
                     })(pos0, result0[0], result0[1]);
                 }
                 if (result0 === null) {
