@@ -6,14 +6,17 @@
   "scripts": {
     "test": "mocha -u tdd"
   },
-  "main": "./lib",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/natefaubion/matches.js.git" 
   },
   "keywords": ["matching", "patterns", "pattern", "match", "functional"],
   "devDependencies": {
-    "mocha": "*"
+    "adt": "*",
+    "mocha": "*",
+    "pegjs": "0.7.x",
+    "benchmark": "1.0.x"
   },
   "license": "MIT"
 }

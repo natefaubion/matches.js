@@ -1,4 +1,4 @@
-var matches = require("../lib");
+var matches = require("../lib/matches");
 var pattern = matches.pattern;
 var Matcher = require("../lib/matcher").Matcher;
 var assert  = require("assert");
