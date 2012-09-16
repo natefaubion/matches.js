@@ -1,1 +1,1 @@
-module.exports = require("lib/matches");
+module.exports = require("./lib/matches");
