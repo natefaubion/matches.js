@@ -188,10 +188,12 @@ Find out more about adt.js: https://github.com/natefaubion/adt.js
 Usage
 -----
 
-Matches.js exports one function, `pattern`.
+Matches.js exports two functions, `pattern` and `caseOf`.
 
 ```js
-var pattern = require("matches").pattern;
+var matches = require("matches");
+var pattern = matches.pattern;
+var caseOf  = matches.caseOf;
 ```
 
 ### pattern(patternObj)
@@ -254,6 +256,24 @@ customPattern(54);
 
 // TypeError: "All patterns exhausted"
 customPattern(12);
+```
+
+### caseOf(args..., patternObj)
+
+You can use `caseOf` to do ad-hoc pattern matching on objects. It's the same
+as immediately invoking a `pattern` function, but lets you put the arguments
+first.
+
+```js
+var result = caseOf(42, {
+  'x@Number' : function (x) { return x * 2; },
+  '_'        : function () { return null; }
+});
+
+// Is the same as...
+var result = pattern({
+  // ...
+})(42);
 ```
 
 ### Combinators

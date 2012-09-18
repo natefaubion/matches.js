@@ -1,5 +1,6 @@
 var matches = require("../lib/matches");
 var pattern = matches.pattern;
+var caseOf  = matches.caseOf;
 var Matcher = require("../lib/matcher").Matcher;
 var assert  = require("assert");
 
@@ -55,5 +56,31 @@ suite("Core", function () {
     assert.equal(chain.next.patternFn.pattern, '{}');
     assert.equal(chain.next.next.patternFn.pattern, '_');
   });
+
+  test("caseOf(patternObj)", function () {
+    function caseFn (arg) {
+      return caseOf(arg, {
+        "[]" : function () { return 1; },
+        "{}" : function () { return 2; },
+        "_"  : function () { return 3; }
+      });
+    }
+    assert.equal(caseFn([]), 1);
+    assert.equal(caseFn({}), 2);
+    assert.equal(caseFn(42), 3);
+  });
+
+  test("caseOf(matcher)", function () {
+    function caseFn (arg) {
+      return caseOf(arg,
+        pattern("[]", function () { return 1; })
+           .alt("{}", function () { return 2; })
+           .alt("_",  function () { return 3; })
+      );
+    }
+    assert.equal(caseFn([]), 1);
+    assert.equal(caseFn({}), 2);
+    assert.equal(caseFn(42), 3);
+  })
 
 });
