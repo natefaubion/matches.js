@@ -691,26 +691,38 @@
           }
           
           function parse_capture() {
-            var result0, result1, result2;
+            var result0, result1, result2, result3, result4;
             var pos0, pos1;
             
             pos0 = pos;
             pos1 = pos;
             result0 = parse_identifierChars();
             if (result0 !== null) {
-              if (input.charCodeAt(pos) === 64) {
-                result1 = "@";
-                pos++;
-              } else {
-                result1 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"@\"");
-                }
-              }
+              result1 = parse__();
               if (result1 !== null) {
-                result2 = parse_capturePattern();
+                if (input.charCodeAt(pos) === 64) {
+                  result2 = "@";
+                  pos++;
+                } else {
+                  result2 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\"@\"");
+                  }
+                }
                 if (result2 !== null) {
-                  result0 = [result0, result1, result2];
+                  result3 = parse__();
+                  if (result3 !== null) {
+                    result4 = parse_capturePattern();
+                    if (result4 !== null) {
+                      result0 = [result0, result1, result2, result3, result4];
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
                 } else {
                   result0 = null;
                   pos = pos1;
@@ -731,7 +743,7 @@
                     value: ident,
                     children: [pattern]
                   };
-                })(pos0, result0[0], result0[2]);
+                })(pos0, result0[0], result0[4]);
             }
             if (result0 === null) {
               pos = pos0;
