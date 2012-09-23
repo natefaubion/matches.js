@@ -154,10 +154,50 @@ var myfn = pattern({
 });
 ```
 
+### Custom Types
+
+You can add pattern matching support for your own classes.
+
+```js
+// Create a new class
+function MyClass () {
+  this.val = 1;
+}
+
+// Matches.js will check for the non-standard attribute `name` on the constructor
+// function. If you are in the browser and want wider support, or are using
+// anonymous functions, make sure you tag your constructor with `className`.
+MyClass.className = "MyClass";
+
+// Add the static method `unapply` for array-like matching.
+MyClass.unapply = function (obj) {
+  return [obj.val];
+};
+
+// Add the static method `unapplyObj` for object-like matching.
+MyClass.unapplyObj = function (obj) {
+  return {
+    'val': obj.val
+  };
+};
+
+// Now you can match on your object.
+var myfn = pattern({
+  // Type-checking
+  'MyClass': function () { ... },
+
+  // Array-like matching
+  'MyClass(a)': function (a) { ... },
+
+  // Object-like matching
+  'MyClass{val: a}': function (a) { ... }
+});
+```
+
 ### Adt.js Types
 
-Matches.js has builtin support for adt.js types. Adt.js is a library for
-building algebraic data types in Javascript.
+Adt.js ships with builtin support for matches.js. Adt.js is a library for
+building algebraic data types or case classes in Javascript.
 
 ```js
 // Create a new adt.js type
@@ -173,7 +213,10 @@ var myfn = pattern({
   'Empty': function () { ... },
 
   // Match on a Node with a value of 12
-  'Node(12, _, _)': function () { ... },
+  'Node(12, ...)': function () { ... },
+
+  // Match using named keys
+  'Node{val: 12, ...}': function () { ... },
 
   // Match on a Node that has non-Empty children
   'Node(_, Node, Node)': function () { ... }
