@@ -47,12 +47,8 @@
           var parseFunctions = {
             "start": parse_start,
             "argumentList": parse_argumentList,
-            "emptyArray": parse_emptyArray,
             "array": parse_array,
-            "arrayRest": parse_arrayRest,
-            "emptyObject": parse_emptyObject,
             "object": parse_object,
-            "objectRest": parse_objectRest,
             "adtClass": parse_adtClass,
             "capture": parse_capture,
             "keyValue": parse_keyValue,
@@ -60,7 +56,6 @@
             "pattern": parse_pattern,
             "capturePattern": parse_capturePattern,
             "arrayRestPatterns": parse_arrayRestPatterns,
-            "objectPatterns": parse_objectPatterns,
             "objectRestPatterns": parse_objectRestPatterns,
             "objectPattern": parse_objectPattern,
             "restPattern": parse_restPattern,
@@ -222,62 +217,6 @@
             return result0;
           }
           
-          function parse_emptyArray() {
-            var result0, result1, result2;
-            var pos0, pos1;
-            
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 91) {
-              result0 = "[";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"[\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse__();
-              if (result1 !== null) {
-                if (input.charCodeAt(pos) === 93) {
-                  result2 = "]";
-                  pos++;
-                } else {
-                  result2 = null;
-                  if (reportFailures === 0) {
-                    matchFailed("\"]\"");
-                  }
-                }
-                if (result2 !== null) {
-                  result0 = [result0, result1, result2];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset) {
-                  return {
-                    pattern: "[]",
-                    type: "array",
-                    children: []
-                  };
-                })(pos0);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            return result0;
-          }
-          
           function parse_array() {
             var result0, result1, result2, result3, result4;
             var pos0, pos1;
@@ -296,76 +235,8 @@
             if (result0 !== null) {
               result1 = parse__();
               if (result1 !== null) {
-                result2 = parse_patterns();
-                if (result2 !== null) {
-                  result3 = parse__();
-                  if (result3 !== null) {
-                    if (input.charCodeAt(pos) === 93) {
-                      result4 = "]";
-                      pos++;
-                    } else {
-                      result4 = null;
-                      if (reportFailures === 0) {
-                        matchFailed("\"]\"");
-                      }
-                    }
-                    if (result4 !== null) {
-                      result0 = [result0, result1, result2, result3, result4];
-                    } else {
-                      result0 = null;
-                      pos = pos1;
-                    }
-                  } else {
-                    result0 = null;
-                    pos = pos1;
-                  }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, patterns) {
-                  var patStrings = patternStrings(patterns);
-                  return {
-                    pattern: "[" + patStrings.join(",") + "]",
-                    type: "array",
-                    children: patterns
-                  };
-                })(pos0, result0[2]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            return result0;
-          }
-          
-          function parse_arrayRest() {
-            var result0, result1, result2, result3, result4;
-            var pos0, pos1;
-            
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 91) {
-              result0 = "[";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"[\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse__();
-              if (result1 !== null) {
                 result2 = parse_arrayRestPatterns();
+                result2 = result2 !== null ? result2 : "";
                 if (result2 !== null) {
                   result3 = parse__();
                   if (result3 !== null) {
@@ -402,71 +273,16 @@
             }
             if (result0 !== null) {
               result0 = (function(offset, patterns) {
+                  patterns || (patterns = []);
                   var patStrings = patternStrings(patterns);
                   var patternStr = "[" + patStrings.join(",") + "]";
                   if (hasMultiRest(patterns)) throwMultRestError(patternStr);
                   return {
                     pattern: patternStr,
-                    type: "arrayRest",
+                    type: "array",
                     children: patterns
                   };
                 })(pos0, result0[2]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            return result0;
-          }
-          
-          function parse_emptyObject() {
-            var result0, result1, result2;
-            var pos0, pos1;
-            
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 123) {
-              result0 = "{";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"{\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse__();
-              if (result1 !== null) {
-                if (input.charCodeAt(pos) === 125) {
-                  result2 = "}";
-                  pos++;
-                } else {
-                  result2 = null;
-                  if (reportFailures === 0) {
-                    matchFailed("\"}\"");
-                  }
-                }
-                if (result2 !== null) {
-                  result0 = [result0, result1, result2];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset) {
-                  return {
-                    pattern: "{}",
-                    type: "object",
-                    children: []
-                  };
-                })(pos0);
             }
             if (result0 === null) {
               pos = pos0;
@@ -492,76 +308,8 @@
             if (result0 !== null) {
               result1 = parse__();
               if (result1 !== null) {
-                result2 = parse_objectPatterns();
-                if (result2 !== null) {
-                  result3 = parse__();
-                  if (result3 !== null) {
-                    if (input.charCodeAt(pos) === 125) {
-                      result4 = "}";
-                      pos++;
-                    } else {
-                      result4 = null;
-                      if (reportFailures === 0) {
-                        matchFailed("\"}\"");
-                      }
-                    }
-                    if (result4 !== null) {
-                      result0 = [result0, result1, result2, result3, result4];
-                    } else {
-                      result0 = null;
-                      pos = pos1;
-                    }
-                  } else {
-                    result0 = null;
-                    pos = pos1;
-                  }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, patterns) {
-                  var patStrings = patternStrings(patterns);
-                  return {
-                    pattern: "{" + patStrings.join(",") + "}",
-                    type: "object",
-                    children: patterns
-                  };
-                })(pos0, result0[2]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            return result0;
-          }
-          
-          function parse_objectRest() {
-            var result0, result1, result2, result3, result4;
-            var pos0, pos1;
-            
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 123) {
-              result0 = "{";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"{\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse__();
-              if (result1 !== null) {
                 result2 = parse_objectRestPatterns();
+                result2 = result2 !== null ? result2 : "";
                 if (result2 !== null) {
                   result3 = parse__();
                   if (result3 !== null) {
@@ -598,12 +346,13 @@
             }
             if (result0 !== null) {
               result0 = (function(offset, patterns) {
+                  patterns || (patterns = []);
                   var patStrings = patternStrings(patterns);
                   var patternStr = "{" + patStrings.join(",") + "}";
                   if (hasMultiRest(patterns)) throwMultRestError(patternStr);
                   return {
                     pattern: patternStr,
-                    type: "objectRest",
+                    type: "object",
                     children: patterns
                   };
                 })(pos0, result0[2]);
@@ -928,29 +677,17 @@
                     if (result0 === null) {
                       result0 = parse_stringLiteral();
                       if (result0 === null) {
-                        result0 = parse_emptyArray();
+                        result0 = parse_array();
                         if (result0 === null) {
-                          result0 = parse_emptyObject();
+                          result0 = parse_object();
                           if (result0 === null) {
-                            result0 = parse_array();
+                            result0 = parse_adtClass();
                             if (result0 === null) {
-                              result0 = parse_arrayRest();
+                              result0 = parse_className();
                               if (result0 === null) {
-                                result0 = parse_object();
+                                result0 = parse_capture();
                                 if (result0 === null) {
-                                  result0 = parse_objectRest();
-                                  if (result0 === null) {
-                                    result0 = parse_adtClass();
-                                    if (result0 === null) {
-                                      result0 = parse_className();
-                                      if (result0 === null) {
-                                        result0 = parse_capture();
-                                        if (result0 === null) {
-                                          result0 = parse_identifier();
-                                        }
-                                      }
-                                    }
-                                  }
+                                  result0 = parse_identifier();
                                 }
                               }
                             }
@@ -968,25 +705,13 @@
           function parse_capturePattern() {
             var result0;
             
-            result0 = parse_emptyArray();
+            result0 = parse_array();
             if (result0 === null) {
-              result0 = parse_emptyObject();
+              result0 = parse_object();
               if (result0 === null) {
-                result0 = parse_array();
+                result0 = parse_adtClass();
                 if (result0 === null) {
-                  result0 = parse_arrayRest();
-                  if (result0 === null) {
-                    result0 = parse_object();
-                    if (result0 === null) {
-                      result0 = parse_objectRest();
-                      if (result0 === null) {
-                        result0 = parse_adtClass();
-                        if (result0 === null) {
-                          result0 = parse_className();
-                        }
-                      }
-                    }
-                  }
+                  result0 = parse_className();
                 }
               }
             }
@@ -1063,107 +788,6 @@
                       if (result5 === null) {
                         result5 = parse_pattern();
                       }
-                      if (result5 !== null) {
-                        result2 = [result2, result3, result4, result5];
-                      } else {
-                        result2 = null;
-                        pos = pos2;
-                      }
-                    } else {
-                      result2 = null;
-                      pos = pos2;
-                    }
-                  } else {
-                    result2 = null;
-                    pos = pos2;
-                  }
-                } else {
-                  result2 = null;
-                  pos = pos2;
-                }
-              }
-              if (result1 !== null) {
-                result0 = [result0, result1];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, head, tail) {
-                  return headTailMerge(head, tail, 3);
-                })(pos0, result0[0], result0[1]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            return result0;
-          }
-          
-          function parse_objectPatterns() {
-            var result0, result1, result2, result3, result4, result5;
-            var pos0, pos1, pos2;
-            
-            pos0 = pos;
-            pos1 = pos;
-            result0 = parse_objectPattern();
-            if (result0 !== null) {
-              result1 = [];
-              pos2 = pos;
-              result2 = parse__();
-              if (result2 !== null) {
-                if (input.charCodeAt(pos) === 44) {
-                  result3 = ",";
-                  pos++;
-                } else {
-                  result3 = null;
-                  if (reportFailures === 0) {
-                    matchFailed("\",\"");
-                  }
-                }
-                if (result3 !== null) {
-                  result4 = parse__();
-                  if (result4 !== null) {
-                    result5 = parse_objectPattern();
-                    if (result5 !== null) {
-                      result2 = [result2, result3, result4, result5];
-                    } else {
-                      result2 = null;
-                      pos = pos2;
-                    }
-                  } else {
-                    result2 = null;
-                    pos = pos2;
-                  }
-                } else {
-                  result2 = null;
-                  pos = pos2;
-                }
-              } else {
-                result2 = null;
-                pos = pos2;
-              }
-              while (result2 !== null) {
-                result1.push(result2);
-                pos2 = pos;
-                result2 = parse__();
-                if (result2 !== null) {
-                  if (input.charCodeAt(pos) === 44) {
-                    result3 = ",";
-                    pos++;
-                  } else {
-                    result3 = null;
-                    if (reportFailures === 0) {
-                      matchFailed("\",\"");
-                    }
-                  }
-                  if (result3 !== null) {
-                    result4 = parse__();
-                    if (result4 !== null) {
-                      result5 = parse_objectPattern();
                       if (result5 !== null) {
                         result2 = [result2, result3, result4, result5];
                       } else {
@@ -3082,9 +2706,7 @@
       "string"     : compileString,
       "identifier" : compileIdentifier,
       "array"      : compileArray,
-      "arrayRest"  : compileArrayRest,
       "object"     : compileObject,
-      "objectRest" : compileObjectRest,
       "capture"    : compileCapture,
       "className"  : compileClassName,
       "adtClass"   : compileAdtClass
@@ -3153,7 +2775,20 @@
       return source.join("\n");
     }
     
+    function hasRest (node) {
+      for (var i = 0, child; (child = node.children[i]); i++) {
+        if (child.type === "rest" || child.type === "restIdentifier") return true;
+      }
+      return false;
+    }
+    
     function compileArray (argName, node) {
+      return hasRest(node)
+        ? compileArrayRest(argName, node)
+        : compileArrayStrict(argName, node);
+    }
+    
+    function compileArrayStrict (argName, node) {
       var arrLen = node.children.length;
       var source = [
         "if (!(" + argName + " instanceof Array) || " + 
@@ -3219,6 +2854,12 @@
     }
     
     function compileObject (argName, node) {
+      return hasRest(node)
+        ? compileObjectRest(argName, node)
+        : compileObjectStrict(argName, node);
+    }
+    
+    function compileObjectStrict (argName, node) {
       // Helper var names
       var keysName = argName + "_keys";
       var countName = argName + "_count";
