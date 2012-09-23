@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Removed specific adt.js support in favor of general custom type support.
+* Removed hyper-specific tokens from the grammar like `emptyArray`, `emptyObject`,
+`arrayRest`, and `objectRest` in favor of compile time checking.
+
 ## 0.2.1
 
 Removed stray debug statement.
