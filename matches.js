@@ -49,7 +49,8 @@
             "argumentList": parse_argumentList,
             "array": parse_array,
             "object": parse_object,
-            "adtClass": parse_adtClass,
+            "classArray": parse_classArray,
+            "classObject": parse_classObject,
             "capture": parse_capture,
             "keyValue": parse_keyValue,
             "patterns": parse_patterns,
@@ -363,7 +364,7 @@
             return result0;
           }
           
-          function parse_adtClass() {
+          function parse_classArray() {
             var result0, result1, result2, result3, result4, result5;
             var pos0, pos1;
             
@@ -383,7 +384,8 @@
               if (result1 !== null) {
                 result2 = parse__();
                 if (result2 !== null) {
-                  result3 = parse_patterns();
+                  result3 = parse_arrayRestPatterns();
+                  result3 = result3 !== null ? result3 : "";
                   if (result3 !== null) {
                     result4 = parse__();
                     if (result4 !== null) {
@@ -424,10 +426,93 @@
             }
             if (result0 !== null) {
               result0 = (function(offset, name, patterns) {
+                  patterns || (patterns = []);
                   var patStrings = patternStrings(patterns);
+                  var patternStr = name + "(" + patStrings.join(",") + ")";
+                  if (hasMultiRest(patterns)) throwMultRestError(patternStr);
                   return {
-                    pattern: name + "(" + patStrings.join(",") + ")",
-                    type: "adtClass",
+                    pattern: patternStr,
+                    type: "classArray",
+                    value: name,
+                    children: patterns
+                  };
+                })(pos0, result0[0], result0[3]);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+            return result0;
+          }
+          
+          function parse_classObject() {
+            var result0, result1, result2, result3, result4, result5;
+            var pos0, pos1;
+            
+            pos0 = pos;
+            pos1 = pos;
+            result0 = parse_classNameChars();
+            if (result0 !== null) {
+              if (input.charCodeAt(pos) === 123) {
+                result1 = "{";
+                pos++;
+              } else {
+                result1 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"{\"");
+                }
+              }
+              if (result1 !== null) {
+                result2 = parse__();
+                if (result2 !== null) {
+                  result3 = parse_objectRestPatterns();
+                  result3 = result3 !== null ? result3 : "";
+                  if (result3 !== null) {
+                    result4 = parse__();
+                    if (result4 !== null) {
+                      if (input.charCodeAt(pos) === 125) {
+                        result5 = "}";
+                        pos++;
+                      } else {
+                        result5 = null;
+                        if (reportFailures === 0) {
+                          matchFailed("\"}\"");
+                        }
+                      }
+                      if (result5 !== null) {
+                        result0 = [result0, result1, result2, result3, result4, result5];
+                      } else {
+                        result0 = null;
+                        pos = pos1;
+                      }
+                    } else {
+                      result0 = null;
+                      pos = pos1;
+                    }
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+            if (result0 !== null) {
+              result0 = (function(offset, name, patterns) {
+                  patterns || (patterns = []);
+                  var patStrings = patternStrings(patterns);
+                  var patternStr = name + "{" + patStrings.join(",") + "}";
+                  if (hasMultiRest(patterns)) throwMultRestError(patternStr);
+                  return {
+                    pattern: patternStr,
+                    type: "classObject",
                     value: name,
                     children: patterns
                   };
@@ -677,17 +762,20 @@
                     if (result0 === null) {
                       result0 = parse_stringLiteral();
                       if (result0 === null) {
-                        result0 = parse_array();
+                        result0 = parse_classArray();
                         if (result0 === null) {
-                          result0 = parse_object();
+                          result0 = parse_classObject();
                           if (result0 === null) {
-                            result0 = parse_adtClass();
+                            result0 = parse_className();
                             if (result0 === null) {
-                              result0 = parse_className();
+                              result0 = parse_array();
                               if (result0 === null) {
-                                result0 = parse_capture();
+                                result0 = parse_object();
                                 if (result0 === null) {
-                                  result0 = parse_identifier();
+                                  result0 = parse_capture();
+                                  if (result0 === null) {
+                                    result0 = parse_identifier();
+                                  }
                                 }
                               }
                             }
@@ -705,13 +793,16 @@
           function parse_capturePattern() {
             var result0;
             
-            result0 = parse_array();
+            result0 = parse_classArray();
             if (result0 === null) {
-              result0 = parse_object();
+              result0 = parse_classObject();
               if (result0 === null) {
-                result0 = parse_adtClass();
+                result0 = parse_className();
                 if (result0 === null) {
-                  result0 = parse_className();
+                  result0 = parse_array();
+                  if (result0 === null) {
+                    result0 = parse_object();
+                  }
                 }
               }
             }
@@ -2698,18 +2789,19 @@
     
     // Mapping of tokens to compiler functions
     var compilers = {
-      "wildcard"   : compileWildcard,
-      "null"       : compileNull,
-      "undefined"  : compileUndefined,
-      "boolean"    : compileBoolean,
-      "number"     : compileNumber,
-      "string"     : compileString,
-      "identifier" : compileIdentifier,
-      "array"      : compileArray,
-      "object"     : compileObject,
-      "capture"    : compileCapture,
-      "className"  : compileClassName,
-      "adtClass"   : compileAdtClass
+      "wildcard"    : compileWildcard,
+      "null"        : compileNull,
+      "undefined"   : compileUndefined,
+      "boolean"     : compileBoolean,
+      "number"      : compileNumber,
+      "string"      : compileString,
+      "identifier"  : compileIdentifier,
+      "array"       : compileArray,
+      "object"      : compileObject,
+      "classArray"  : compileClassArray,
+      "classObject" : compileClassObject,
+      "className"   : compileClassName,
+      "capture"     : compileCapture
     };
     
     
@@ -2966,24 +3058,27 @@
       return source.join("\n");
     }
     
-    function compileAdtClass (argName, node) {
-      var clsName = argName + "_class";
+    function compileClassArray (argName, node) {
+      var valsName = argName + "_vals";
       var source = [
-        "var " + clsName + " = runt.findADT(" + argName + ", '" + node.value + "');",
-        "if (!" + clsName + ") return false;",
-        "if (" + clsName + ".__names.length !== " + node.children.length + ") {",
-          "runt.errorADT('" + node.value + "', '" + node.pattern + "');",
-        "}"
+        "if (!(" + argName + " instanceof Object)) return false;",
+        compileClassName(argName, node),
+        "if (!" + argName + ".constructor || !" + argName + ".constructor.unapply) return false;",
+        "var " + valsName + " = " + argName + ".constructor.unapply(" + argName +");",
+        compileArray(valsName, node)
       ];
+      return source.join("\n");
+    }
     
-      node.children.forEach(function (child, i) {
-        var childArgName = argName + "_" + i;
-        source.push(
-          "var " + childArgName + " = " + argName + ".slot(" + i + ");",
-          compilePattern(childArgName, child)
-        );
-      });
-    
+    function compileClassObject (argName, node) {
+      var valsName = argName + "_vals";
+      var source = [
+        "if (!(" + argName + " instanceof Object)) return false;",
+        compileClassName(argName, node),
+        "if (!" + argName + ".constructor || !" + argName + ".constructor.unapplyObj) return false;",
+        "var " + valsName + " = " + argName + ".constructor.unapplyObj(" + argName +");",
+        compileObject(valsName, node)
+      ];
       return source.join("\n");
     }
     return module.exports;
@@ -2991,16 +3086,6 @@
 
   require.modules['./runtime'] = (function () {
     var module = {exports: {}}, exports = module.exports;
-    var adt;
-    try {
-      adt = require("adt");
-    } catch (e) {
-      adt = null;
-    }
-    
-    // Check if we are in the browser
-    if (!adt && window) adt = window.adt;
-    
     var toString = Object.prototype.toString;
     
     // Given an object and a class name, tries to determine if the object is an
@@ -3011,49 +3096,17 @@
         return true;
       }
     
-      if (isADT(obj)) {
-        var types = adt.lookup(name);
-        if (types) {
-          for (var i = 0, len = types.length; i < len; i++) {
-            if (obj instanceof types[i]) return true;
-          }
+      if (obj.constructor) {
+        if (obj.constructor.name === name || obj.constructor.className === name) {
+          return true;
         }
-        return false;
       }
     
       return false;
     }
     
-    // Checks whether an object is an adt.js type.
-    function isADT (obj) {
-      return !!adt && obj instanceof adt.__Base__;
-    }
-    
-    // Looks up an adt.js type and returns it
-    function findADT (obj, name) {
-      if (isADT(obj)) {
-        var types = adt.lookup(name);
-        if (types) {
-          for (var i = 0, len = types.length; i < len; i++) {
-            if (obj instanceof types[i]) return types[i];
-          }
-        }
-      }
-    
-      return undefined;
-    }
-    
-    function errorADT (name, pattern) {
-      throw new TypeError("Wrong number of arguments applied to " + name + " in sub-pattern " + pattern);
-    }
-    
     // Export
-    module.exports = {
-      matchesTypeName: matchesTypeName,
-      isADT: isADT,
-      findADT: findADT,
-      errorADT: errorADT
-    };
+    exports.matchesTypeName = matchesTypeName;
     return module.exports;
   })();
 

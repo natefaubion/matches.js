@@ -194,8 +194,51 @@ suite("Patterns", function () {
   var bar2 = Foo.Bar(baz, 2, 3);
 
   testPattern("Bar(a, 2, Number)", bar);
+  testPattern("Bar(1, ...)", bar);
+
   testPattern("Bar(a@Baz(b), _, _)", bar2, function (a, b) {
     return a === baz && b === 42;
   });
+
+  testPattern("Bar(a, b...)", bar, function (a, b) {
+    return a === 1
+        && b[0] === 2
+        && b[1] === 3;
+  });
+
+  testPattern("Bar{a, b, c}", bar, function (a, b, c) {
+    return a === 1
+        && b === 2
+        && c === 3;
+  });
+
+  testPattern("Bar{a: 1, b: 2, c: 3}", bar);
+  testPattern("Bar{a: 1, ...}", bar);
+  
+  testPattern("Bar{a: 1, b...}", bar, function (b) {
+    return b.a === undefined
+        && b.b === 2
+        && b.c === 3;
+  });
+
+  // Custom types
+  // ------------
+
+  function Test () {
+    this.a = 1;
+  }
+
+  Test.unapply = function (obj) {
+    return [obj.a];
+  };
+
+  Test.unapplyObj = function (obj) {
+    return {a: obj.a};
+  };
+
+  var t = new Test();
+  testPattern("Test", t);
+  testPattern("Test(1)", t);
+  testPattern("Test{a: 1}", t);
 
 });
