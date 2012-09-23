@@ -1,5 +1,5 @@
 var Benchmark = require("benchmark");
-var pattern = require("../lib").pattern;
+var pattern = require("../").pattern;
 var suite = Benchmark.Suite();
 
 function ok () {

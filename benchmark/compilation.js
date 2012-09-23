@@ -1,7 +1,7 @@
 var Benchmark = require("benchmark");
 var bench = Benchmark({
   util: require("./util"),
-  pattern: require("../lib").pattern,
+  pattern: require("../").pattern,
   setup: function () {
     var c = this.count;
     var patterns = [];
