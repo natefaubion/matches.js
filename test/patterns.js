@@ -241,4 +241,20 @@ suite("Patterns", function () {
   testPattern("Test(1)", t);
   testPattern("Test{a: 1}", t);
 
+  // Edge cases
+  // ----------
+
+  // An instance with overriden object prototype methods.
+  // Issue #4: A pattern should have failed where it was succeeding because
+  // the prototype `toString` method of the lookup object was matching the
+  // `toString` method here. This was fixed by making the conditional that
+  // checked the lookup object use `hasOwnProperty` instead of an `in` check.
+  function OverrideProto () {
+    this.a = 1;
+    this.toString = function () { return ""; };
+  }
+
+  var op = new OverrideProto();
+  failPattern("{fail, ...}", op);
+
 });

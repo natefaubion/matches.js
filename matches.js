@@ -2967,7 +2967,7 @@
         "var " + keysName + " = {" + keys.join(",") + "};",
         "var " + countName + " = 0;",
         "for (var " + iName + " in " + argName + ") {",
-          "if (!(" + iName + " in " + keysName + ")) return false;",
+          "if (!(" + keysName + ".hasOwnProperty(" + iName + "))) return false;",
           "else " + countName + " += 1;",
         "}",
         "if (" + countName + " !== " + node.children.length + ") return false;"
@@ -3020,14 +3020,14 @@
       // secondary object.
       if (hasRestIdent) {
         source.push(
-          "if (!(" + iName + " in " + keysName + ")) " + restName + "[" + iName + "] = " + argName + "[" + iName + "];",
+          "if (!(" + keysName + ".hasOwnProperty(" + iName + "))) " + restName + "[" + iName + "] = " + argName + "[" + iName + "];",
           "else " + countName + " += 1;"
         );
       } 
       // Just check that all supplied keys are there.
       else {
         source.push(
-          "if (" + iName + " in " + keysName + ") " + countName + " += 1;"
+          "if (" + keysName + ".hasOwnProperty(" + iName + ")) " + countName + " += 1;"
         );
       }
     
