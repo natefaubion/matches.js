@@ -1,3 +1,10 @@
+## 0.3.1
+
+* Added support for string keys in objects
+* Fixed a bug in the compiled functions for objects matching on Object
+prototype keys.
+* Updated adt.js version number
+
 ## 0.3.0
 
 * Removed specific adt.js support in favor of general custom type support.
