@@ -73,6 +73,7 @@
             "numberLiteral": parse_numberLiteral,
             "stringLiteral": parse_stringLiteral,
             "boolean": parse_boolean,
+            "keyChars": parse_keyChars,
             "restChars": parse_restChars,
             "identifierChars": parse_identifierChars,
             "classNameChars": parse_classNameChars,
@@ -591,7 +592,7 @@
             
             pos0 = pos;
             pos1 = pos;
-            result0 = parse_jsIdentifierChars();
+            result0 = parse_keyChars();
             if (result0 !== null) {
               result1 = parse__();
               if (result1 !== null) {
@@ -633,9 +634,9 @@
             if (result0 !== null) {
               result0 = (function(offset, key, pattern) {
                   return {
-                    pattern: key + ":" + pattern.pattern,
+                    pattern: quote(key) + ":" + pattern.pattern,
                     type: "keyValue",
-                    value: key,
+                    value: quote(key),
                     children: [pattern]
                   };
                 })(pos0, result0[0], result0[4]);
@@ -1199,13 +1200,13 @@
             var pos0;
             
             pos0 = pos;
-            result0 = parse_jsIdentifierChars();
+            result0 = parse_keyChars();
             if (result0 !== null) {
               result0 = (function(offset, key) {
                   return {
-                    pattern: key,
+                    pattern: quote(key),
                     type: "key",
-                    value: key
+                    value: quote(key)
                   };
                 })(pos0, result0);
             }
@@ -1356,6 +1357,16 @@
                   matchFailed("\"false\"");
                 }
               }
+            }
+            return result0;
+          }
+          
+          function parse_keyChars() {
+            var result0;
+            
+            result0 = parse_jsIdentifierChars();
+            if (result0 === null) {
+              result0 = parse_string();
             }
             return result0;
           }
@@ -2781,6 +2792,7 @@
         compileArgumentList(tree),
         "return ret;"
       ];
+    
       return new Function(["args", "runt"], source.join("\n"));
     }
     
@@ -2977,12 +2989,12 @@
         var childArgName = argName + "_" + i;
         // If the child is just a key, stash it.
         if (child.type === "key") {
-          source.push("ret.push(" + argName + "." + child.value + ");");
+          source.push("ret.push(" + argName + "[" + child.value + "]);");
         }
         // If the child is a keyValue, perform further compilation.
         else {
           source.push(
-            "var " + childArgName + " = " + argName + "." + child.value + ";",
+            "var " + childArgName + " = " + argName + "[" + child.value + "];",
             compilePattern(childArgName, child.children[0])
           );
         }
@@ -3040,12 +3052,12 @@
         var childArgName = argName + "_" + i;
         // If the child is just a key, stash it.
         if (child.type === "key") {
-          source.push("ret.push(" + argName + "." + child.value + ");");
+          source.push("ret.push(" + argName + "[" + child.value + "]);");
         }
         // If the child is a keyValue, perform further compilation.
         else if (child.type === "keyValue") {
           source.push(
-            "var " + childArgName + " = " + argName + "." + child.value + ";",
+            "var " + childArgName + " = " + argName + "[" + child.value + "];",
             compilePattern(childArgName, child.children[0])
           );
         }

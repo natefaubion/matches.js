@@ -173,6 +173,10 @@ suite("Patterns", function () {
         && c.b === undefined;
   });
 
+  testPattern("{'a b c':x}", {'a b c': 2}, function (x) {
+    return x === 2;
+  })
+
   // Captures
   // --------
 
