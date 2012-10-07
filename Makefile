@@ -6,7 +6,7 @@ MOCHA   = $(shell find node_modules -name "mocha" -type f)
 all: matches.min.js
 
 matches.min.js: matches.js
-	@$(UGLIFY) -nmf $< > $@
+	@$(UGLIFY) $< > $@
 
 matches.js:
 	@bash support/browser.sh $(DIR) $(MODULES) > $@
