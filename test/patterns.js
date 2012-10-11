@@ -1,5 +1,6 @@
 var matches = require("../lib/matches");
 var pattern = matches.pattern;
+var caseOf = matches.caseOf;
 var assert = require("assert");
 var adt = require("adt");
 
@@ -107,6 +108,20 @@ suite("Patterns", function () {
 
   testPattern("[...]", [1, 2, 3], function (a) {
     return a === void 0;
+  });
+
+  // Rest Arguments
+  // --------------
+
+  test("a, b...", function () {
+    assert.ok(caseOf(1, 2, 3, {
+      "a, b...": function (a, b) {
+        return a === 1
+            && b.length === 2
+            && b[0] === 2
+            && b[1] === 3;
+      }
+    }));
   });
 
   // Objects
