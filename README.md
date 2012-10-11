@@ -15,7 +15,7 @@ var mymap = pattern({
   '_, []' : function () { 
     return [];
   },
-  'f, [x, xs...]' : function (f, x, xs) {
+  'f, [x, ...xs]' : function (f, x, xs) {
     return [f(x)].concat(mymap(f, xs));
   }
 });
@@ -55,16 +55,12 @@ var myfn = pattern({
 
 ### Wildcards
 
-Underscores will match successfully on any value but ignore it. A single
-underscore works well as a catch all pattern.
+Underscores will match successfully on any value but ignore it.
 
 ```js
 var myfn = pattern({
   // Match if second argument is 12, ignoring the first
-  '_, 12' : function () { ... },
-
-  // Match on anything
-  '_' : function () { ... }
+  '_, 12' : function () { ... }
 });
 ```
 
@@ -84,6 +80,24 @@ var myfn = pattern({
 });
 ```
 
+### Rest Arguments
+
+Use an ellipsis for rest arguments. A single ellipsis works as a catch all
+pattern.
+
+```js
+var myfn = pattern({
+  // Match if first argument is 12, get all the rest as an array
+  '12, ...args': function (args) { ... },
+
+  // Get the last argument
+  '..., x': function (x) { ... },
+
+  // Match on anything and any number of arguments
+  '...': function () { ... }
+});
+```
+
 ### Arrays
 
 Match on the entire array, or only a few values.
@@ -100,7 +114,7 @@ var myfn = pattern({
   '[x, ...]': function (x) { ... },
 
   // Split it into a head and tail
-  '[head, tail...]': function (head, tail) { ... },
+  '[head, ...tail]': function (head, tail) { ... },
 
   // Grab the first and last items, ignoring the middle
   '[x, ..., y]': function (x, y) { ... },
@@ -109,7 +123,7 @@ var myfn = pattern({
   '[..., last]': function (last) { ... },
 
   // Make a shallow clone
-  '[clone...]': function (clone) { ... },
+  '[...clone]': function (clone) { ... },
 
   // Grab the first item, but also pass on the whole array
   'arr@[first, ...]': function (arr, first) { ... }
@@ -135,7 +149,7 @@ var myfn = pattern({
   '{x: a@Number, y: b@Number, c...}': function (a, b, c) { ... },
 
   // Make a shallow clone of an object
-  '{clone...}': function (clone) { ... }
+  '{...clone}': function (clone) { ... }
 })
 ```
 
