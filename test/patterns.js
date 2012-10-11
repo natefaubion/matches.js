@@ -79,7 +79,7 @@ suite("Patterns", function () {
     return x === 42;
   });
 
-  testPattern("[x..., y, z]", [1, 1, 1, 2, 3], function (x, y, z) {
+  testPattern("[...x, y, z]", [1, 1, 1, 2, 3], function (x, y, z) {
     return x.length === 3
         && x[0] === 1
         && x[1] === 1
@@ -88,7 +88,7 @@ suite("Patterns", function () {
         && z === 3;
   });
 
-  testPattern("[x, y..., z]", [1, 2, 2, 2, 3], function (x, y, z) {
+  testPattern("[x, ...y, z]", [1, 2, 2, 2, 3], function (x, y, z) {
     return y.length === 3 
         && y[0] === 2
         && y[1] === 2
@@ -97,7 +97,7 @@ suite("Patterns", function () {
         && z === 3;
   });
 
-  testPattern("[x, y, z...]", [1, 2, 3, 3, 3], function (x, y, z) {
+  testPattern("[x, y, ...z]", [1, 2, 3, 3, 3], function (x, y, z) {
     return z.length === 3 
         && z[0] === 3
         && z[1] === 3
@@ -113,9 +113,9 @@ suite("Patterns", function () {
   // Rest Arguments
   // --------------
 
-  test("a, b...", function () {
+  test("a, ...b", function () {
     assert.ok(caseOf(1, 2, 3, {
-      "a, b...": function (a, b) {
+      "a, ...b": function (a, b) {
         return a === 1
             && b.length === 2
             && b[0] === 2
@@ -152,7 +152,7 @@ suite("Patterns", function () {
     return a === 1 && b === 2;
   });
 
-  testPattern("{a, b, c...}", {a: 1, b: 2, c: 3}, function (a, b, c) {
+  testPattern("{a, b, ...c}", {a: 1, b: 2, c: 3}, function (a, b, c) {
     return a === 1 
         && b === 2
         && c.c === 3
@@ -164,7 +164,7 @@ suite("Patterns", function () {
     return x === 1 && y === 2;
   });
 
-  testPattern("{a:x, b:y, c...}", {a: 1, b: 2, c: 3}, function (x, y, c) {
+  testPattern("{a:x, b:y, ...c}", {a: 1, b: 2, c: 3}, function (x, y, c) {
     return x === 1 
         && y === 2
         && c.c === 3
@@ -172,7 +172,7 @@ suite("Patterns", function () {
         && c.b === undefined;
   });
 
-  testPattern("{c..., a:x, b:y}", {a: 1, b: 2, c: 3}, function (c, x, y) {
+  testPattern("{...c, a:x, b:y}", {a: 1, b: 2, c: 3}, function (c, x, y) {
     return x === 1 
         && y === 2
         && c.c === 3
@@ -180,7 +180,7 @@ suite("Patterns", function () {
         && c.b === undefined;
   });
   
-  testPattern("{a:x, c..., b:y}", {a: 1, b: 2, c: 3}, function (x, c, y) {
+  testPattern("{a:x, ...c, b:y}", {a: 1, b: 2, c: 3}, function (x, c, y) {
     return x === 1 
         && y === 2
         && c.c === 3
@@ -196,7 +196,7 @@ suite("Patterns", function () {
   // --------
 
   var arr = [1, 2, 3];
-  testPattern("x@[head, tail...]", arr, function (x, head, tail) {
+  testPattern("x@[head, ...tail]", arr, function (x, head, tail) {
     return x === arr && head === 1 && tail.length === 2;
   });
 
@@ -219,7 +219,7 @@ suite("Patterns", function () {
     return a === baz && b === 42;
   });
 
-  testPattern("Bar(a, b...)", bar, function (a, b) {
+  testPattern("Bar(a, ...b)", bar, function (a, b) {
     return a === 1
         && b[0] === 2
         && b[1] === 3;
@@ -234,7 +234,7 @@ suite("Patterns", function () {
   testPattern("Bar{a: 1, b: 2, c: 3}", bar);
   testPattern("Bar{a: 1, ...}", bar);
   
-  testPattern("Bar{a: 1, b...}", bar, function (b) {
+  testPattern("Bar{a: 1, ...b}", bar, function (b) {
     return b.a === undefined
         && b.b === 2
         && b.c === 3;
