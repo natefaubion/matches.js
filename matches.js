@@ -90,7 +90,7 @@
     
     // The root of the tree.
     function argumentList (inp) {
-      return nodeArgumentList(patterns(inp));
+      return nodeArgumentList(restPatterns(inp));
     }
     
     // A comma-separated list of patterns expressions.
@@ -118,6 +118,7 @@
           || numberLiteral(inp)
           || stringLiteral(inp)
           || classPattern(inp)
+          || extractor(inp)
           || array(inp)
           || object(inp)
           || identPattern(inp);
@@ -125,11 +126,12 @@
     
     // Parses a rest identifier or '...'
     function rest (inp) {
-      var match = inp.takeAPeek(REST_IDENT);
-      if (match) return nodeRestIdentifier(match[1]);
-    
       var res = inp.takeAPeek("...");
-      if (res) return nodeRest(res);
+      if (res) {
+        var match = inp.takeAPeek(IDENT)
+        if (match) return nodeRestIdentifier(match[0]);
+        else return nodeRest();
+      }
     }
     
     // Parses a wildcard character.
@@ -169,17 +171,31 @@
     function classPattern (inp) {
       var match = inp.takeAPeek(CLASS);
       if (match) {
+        var name = match[0];
+    
         // Object-like destructuring.
         var res = object(inp);
-        if (res) return nodeClassObject(match[0], res);
+        if (res) return nodeClass(name, res);
     
         // Array-like dstructuring, but uses parens instead of brackets so we need
         // to use a custom series.
         res = series("(", ")", restPatterns, nodeArray, inp);
-        if (res) return nodeClassArray(match[0], res);
+        if (res) return nodeClass(name, res);
     
         // Just a class name.
-        return nodeClassName(match[0]);
+        return nodeClass(name);
+      }
+    }
+    
+    // Parses custom extractors.
+    function extractor (inp) {
+      var match = inp.takeAPeek(EXTRACTOR);
+      if (match)
+        return series("(", ")", pattern, extractorRes, inp)
+            || nodeExtractor(match[1]);
+    
+      function extractorRes (res) {
+        return nodeExtractor(match[1], res);
       }
     }
     
@@ -227,7 +243,7 @@
     function identPattern (inp) {
       var match = inp.takeAPeek(IDENT);
       if (match) {
-        // Is this a capture?
+        // Is this a capture?)
         if (inp.takeAPeek("@")) {
           var patt = capturePattern(inp);
           if (patt) return nodeCapture(match[0], patt);
@@ -244,6 +260,11 @@
       return classPattern(inp)
           || array(inp)
           || object(inp);
+    }
+    
+    // Parses patterns that have a name and optional destructuring like classes
+    // and extractors.
+    function classLikePattern (nameRegx, matchIndex, nodeFn, inp) {
     }
     
     // Parses a series, like an array or object.
@@ -401,9 +422,9 @@
     var BOOL               = /^(true|false)\b/;
     
     var IDENT              = /^[a-z][_$a-zA-Z0-9]*/;
-    var REST_IDENT         = /^([a-z][_$a-zA-Z0-9]*)\.\.\./;
     var JS_IDENT           = /^[_$a-zA-Z][_$a-zA-Z0-9]*/;
     var CLASS              = /^[A-Z][_$a-zA-Z0-9]*/;
+    var EXTRACTOR          = /^\$([_$a-zA-Z][_$a-zA-Z0-9]*)/;
     
     var DOUBLE_QUOTED_CHAR = /^(?!["\\])./;
     var SINGLE_QUOTED_CHAR = /^(?!['\\])./;
@@ -431,15 +452,15 @@
     }
     
     function nodeArgumentList (res) {
-      return node("argumentList", patternStrings(res).join(","), res);
+      return node("argumentList", patternStrings(res).join(","), undefined, res);
     }
     
-    function nodeRest (res) {
+    function nodeRest () {
       return node("rest", "...");
     }
     
     function nodeRestIdentifier (res) {
-      return node("restIdentifier", res + "...", res);
+      return node("restIdentifier", "..." + res, res);
     }
     
     function nodeWildcard () {
@@ -466,18 +487,6 @@
       return node("string", quote(res), res);
     }
     
-    function nodeClassName (res) {
-      return node("className", res, res);
-    }
-    
-    function nodeClassArray (res, arr) {
-      return node("classArray", res + arr.pattern, res, arr.children);
-    }
-    
-    function nodeClassObject (res, obj) {
-      return node("classObject", res + obj.pattern, res, obj.children);
-    }
-    
     function nodeArray (res) {
       return node("array", "[" + patternStrings(res).join(",") + "]", undefined, res);
     }
@@ -502,6 +511,21 @@
     function nodeKeyValue (key, value) {
       key = quote(key);
       return node("keyValue", key + ":" + value.pattern, key, [value]);
+    }
+    
+    function nodeClass (name, children) {
+      var patt = name;
+      if (children)
+        patt += children.type === "array"
+          ? "(" + children.pattern.substring(1, children.pattern.length - 1) + ")"
+          : children.pattern;
+      return node("class", patt, name, children);
+    }
+    
+    function nodeExtractor (name, children) {
+      return children
+        ? node("extractor", "$" + name + "(" + children.pattern + ")", name, children)
+        : node("extractor", "$" + name, name);
     }
     
     // Utility Functions
@@ -578,12 +602,11 @@
       "number"      : compileNumber,
       "string"      : compileString,
       "identifier"  : compileIdentifier,
+      "capture"     : compileCapture,
       "array"       : compileArray,
       "object"      : compileObject,
-      "classArray"  : compileClassArray,
-      "classObject" : compileClassObject,
-      "className"   : compileClassName,
-      "capture"     : compileCapture
+      "class"       : compileClass,
+      "extractor"   : compileExtractor
     };
     
     
@@ -591,15 +614,7 @@
     // ------------------
     
     function compileArgumentList (node) {
-      var source = [];
-      for (var i = 0, len = node.value.length, argName; i < len; i++) {
-        argName = "arg_" + i;
-        source.push(
-          "var " + argName + " = args[" + i + "];",
-          compilePattern(argName, node.value[i])
-        );
-      }
-      return source.join("\n");
+      return compileArray('args', node);
     }
     
     function compilePattern (argName, node) {
@@ -634,10 +649,6 @@
     
     function compileIdentifier (argName) {
       return "ret.push(" + argName + ");";
-    }
-    
-    function compileClassName (argName, node) {
-      return "if (!runt.matchesTypeName(" + argName + ", '" + node.value + "')) return false;"
     }
     
     function compileCapture (argName, node) {
@@ -840,6 +851,20 @@
       return source.join("\n");
     }
     
+    function compileClass (argName, node) {
+      var fn = compileClassName;
+      if (node.children) {
+        fn = node.children.type === "array"
+          ? compileClassArray
+          : compileClassObject;
+      }
+      return fn(argName, node);
+    }
+    
+    function compileClassName (argName, node) {
+      return "if (!runt.matchesTypeName(" + argName + ", '" + node.value + "')) return false;"
+    }
+    
     function compileClassArray (argName, node) {
       var valsName = argName + "_vals";
       var source = [
@@ -847,7 +872,7 @@
         compileClassName(argName, node),
         "if (!" + argName + ".constructor || !" + argName + ".constructor.unapply) return false;",
         "var " + valsName + " = " + argName + ".constructor.unapply(" + argName +");",
-        compileArray(valsName, node)
+        compileArray(valsName, node.children)
       ];
       return source.join("\n");
     }
@@ -859,8 +884,26 @@
         compileClassName(argName, node),
         "if (!" + argName + ".constructor || !" + argName + ".constructor.unapplyObj) return false;",
         "var " + valsName + " = " + argName + ".constructor.unapplyObj(" + argName +");",
-        compileObject(valsName, node)
+        compileObject(valsName, node.children)
       ];
+      return source.join("\n");
+    }
+    
+    function compileExtractor (argName, node) {
+      // The name for the extracted Pass/Fail object.
+      var extName = argName + "_ext";
+      // The name of the extracted value.
+      var valName = argName + "_val";
+      var source = [
+        "var " + extName + " = runt.callExtractor('" + node.value  + "', " + argName + ");",
+        "if (!" + extName + " || !(" + extName + " instanceof runt.Pass)) return false;"
+      ];
+      
+      if (node.children) {
+        source.push("var " + valName + " = " + extName + ".val;");
+        source.push(compilePattern(valName , node.children));
+      }
+    
       return source.join("\n");
     }
     return module.exports;
@@ -887,8 +930,31 @@
       return false;
     }
     
+    // Lookup table of extractors
+    var extractors = {};
+    
+    // Given a name and value, looks up an extractor and calls it. If the extractor
+    // does not exist, it will throw an error.
+    function callExtractor(name, val) {
+      if (!extractors.hasOwnProperty(name)) {
+        throw new Error("Extractor does not exist: " + name);
+      }
+      return extractors[name](val, Pass);
+    }
+    
+    // Extractors must return an instance of `Pass` to count as a successful match.
+    // We can't use a sentinal value like `undefined` to count as a fail since
+    // its a valid value to match on.
+    function Pass (val) {
+      if (!(this instanceof Pass)) return new Pass(val);
+      this.val = val;
+    }
+    
     // Export
     exports.matchesTypeName = matchesTypeName;
+    exports.extractors = extractors;
+    exports.callExtractor = callExtractor;
+    exports.Pass = Pass;
     return module.exports;
   })();
 
@@ -1087,6 +1153,7 @@
     exports.caseOf = caseOf;
     exports.parser = parser;
     exports.compiler = compiler;
+    exports.extractors = require("./runtime").extractors;
     return module.exports;
   })();
 
