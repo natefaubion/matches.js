@@ -265,7 +265,7 @@ var myfn = pattern({
   '$email(x)': function (x) { ... },
 
   // Match on the extracted value
-  '$email(x@{domain: "foo.com"})': function (x) { ... }
+  '$email(x@{domain: "foo.com", ...})': function (x) { ... }
 });
 ```
 
