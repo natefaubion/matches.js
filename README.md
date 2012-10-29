@@ -242,6 +242,33 @@ var myfn = pattern({
 
 Find out more about adt.js: https://github.com/natefaubion/adt.js
 
+### Custom Extractors
+
+Extend matches.js with custom extractors.
+
+```js
+// Naive email extractor.
+// Extractors are passed the value, and a `pass` function. In order to count as
+// a successful match, the extractor must return a instance of pass.
+matches.extractors.email = function (val, pass) {
+  if (typeof val === "string" && val.indexOf("@") > 0) {
+    var parts = val.split("@");
+    return pass({
+      user: parts[0],
+      domain: parts[1]
+    });
+  }
+};
+
+var myfn = pattern({
+  // Extractors are called by prefixing the name with a $
+  '$email(x)': function (x) { ... },
+
+  // Match on the extracted value
+  '$email(x@{domain: 'foo.com'})': function (x) { ... }
+});
+```
+
 Usage
 -----
 
