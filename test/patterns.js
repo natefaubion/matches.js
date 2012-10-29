@@ -260,6 +260,26 @@ suite("Patterns", function () {
   testPattern("Test(1)", t);
   testPattern("Test{a: 1}", t);
 
+  // Extractors
+  // ----------
+
+  matches.extractors.email = function (val, pass) {
+    if (typeof val === "string" && val.indexOf("@") > 0) {
+      var parts = val.split("@");
+      return pass({
+        user: parts[0],
+        domain: parts[1]
+      });
+    }
+  };
+
+  testPattern("$email(x)", "foo@bar.com", function (x) {
+    return x.user === "foo"
+        && x.domain === "bar.com";
+  });
+
+  failPattern("$email(x)", "not an email");
+
   // Edge cases
   // ----------
 
