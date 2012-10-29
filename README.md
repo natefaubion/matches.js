@@ -249,7 +249,7 @@ Extend matches.js with custom extractors.
 ```js
 // Naive email extractor.
 // Extractors are passed the value, and a `pass` function. In order to count as
-// a successful match, the extractor must return a instance of pass.
+// a successful match, the extractor must return an instance of pass.
 matches.extractors.email = function (val, pass) {
   if (typeof val === "string" && val.indexOf("@") > 0) {
     var parts = val.split("@");
@@ -265,7 +265,7 @@ var myfn = pattern({
   '$email(x)': function (x) { ... },
 
   // Match on the extracted value
-  '$email(x@{domain: 'foo.com'})': function (x) { ... }
+  '$email(x@{domain: "foo.com"})': function (x) { ... }
 });
 ```
 
