@@ -403,12 +403,6 @@ var myfn = pattern({
   // Matches anything
   '...': function () { return null; }
 });
-
-// 12
-myfn(6, function (x) { return x * 2; }, "foo", "bar");
-
-// null
-myfn(1, 2, 3, 4);
 ```
 
 ### Performance
