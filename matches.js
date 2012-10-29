@@ -2,7 +2,7 @@
 // ----------
 // Powerful pattern matching for Javascript
 //
-// version : 0.3.1
+// version : 0.4.0
 // author  : Nathan Faubion <nathan@n-son.com>
 // license : MIT
 

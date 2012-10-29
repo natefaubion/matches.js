@@ -1,3 +1,8 @@
+## 0.4.0
+
+* Rest arguments have the identifier after the ellipsis ala ES6.
+* Added custom extractors
+
 ## 0.3.1
 
 * Added support for string keys in objects
