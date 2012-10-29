@@ -390,7 +390,7 @@ mychain(5);
 Separate matches for multiple arguments with a comma. Since you can pass any
 number of arguments to functions in Javascript, Matches.js is not strict and
 will happily combine patterns for varying numbers of arguments. However,
-matches.js is strict on the humber of arguments within the pattern.
+Matches.js is strict on the number of arguments within the pattern.
 
 ```js
 var myfn = pattern({
