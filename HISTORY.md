@@ -1,5 +1,6 @@
 ## 0.4.0
 
+* Added rest arguments. Argument length matching is now strict.
 * Rest arguments have the identifier after the ellipsis ala ES6.
 * Added custom extractors
 
