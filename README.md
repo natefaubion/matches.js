@@ -130,26 +130,43 @@ var myfn = pattern({
 });
 ```
 
+### Rest Expressions
+
+Rests (`...`) can do more than just split up an array. You can combine them
+with arbitrary patterns to apply said pattern across every element in the array.
+
+```js
+var myfn = pattern({
+  // Make sure every element is a string
+  '[...String]': function () { ... },
+
+  // Extract values from tuples
+  '[...[x, y]]': function (xs, ys) { ... },
+
+  // Extract values from objects
+  '[...{name}]': function (names) { ... },
+
+  // You can even nest rest expressions
+  '[...[head, ...tail]]': function (heads, tails) { ... }
+});
+```
+
 ### Objects
 
 Like with an array, you can match on an entire object, or just a few keys.
+Unlike arrays, matching is only non-strict. It checks that the keys exist, but
+other keys are allowed to exist in the object.
 
 ```js
 var myfn = pattern({
   // Empty object
   '{}': function () { ... },
 
-  // Check that an object has only two keys 'x' and 'y', and pass to the function
+  // Check that an object has two keys 'x' and 'y', and pass to the function
   '{x, y}': function (x, y) { ... },
 
   // Check that an object has a key 'children' that contains an array
-  '{children: [a, b], ...}': function (a, b) { ... },
-
-  // Match on two keys, 'x' and 'y' and copy the rest to another object
-  '{x: a@Number, y: b@Number, ...c}': function (a, b, c) { ... },
-
-  // Make a shallow clone of an object
-  '{...clone}': function (clone) { ... }
+  '{children: [a, b]}': function (a, b) { ... },
 })
 ```
 
@@ -230,7 +247,7 @@ var myfn = pattern({
   'Node(12, ...)': function () { ... },
 
   // Match using named keys
-  'Node{val: 12, ...}': function () { ... },
+  'Node{val: 12}': function () { ... },
 
   // Match on a Node that has non-Empty children
   'Node(_, Node, Node)': function () { ... }
@@ -265,7 +282,7 @@ var myfn = pattern({
   '$email(x)': function (x) { ... },
 
   // Match on the extracted value
-  '$email(x@{domain: "foo.com", ...})': function (x) { ... }
+  '$email(x@{domain: "foo.com"})': function (x) { ... }
 });
 ```
 
