@@ -1,6 +1,7 @@
 var matches = require("../lib/matches");
 var pattern = matches.pattern;
 var caseOf  = matches.caseOf;
+var extract = matches.extract;
 var Matcher = require("../lib/matcher").Matcher;
 var assert  = require("assert");
 
@@ -81,6 +82,17 @@ suite("Core", function () {
     assert.equal(caseFn([]), 1);
     assert.equal(caseFn({}), 2);
     assert.equal(caseFn(42), 3);
-  })
+  });
+
+  test("extract()", function () {
+    var res = extract("[x, ...]", [1, 2, 3]);
+    assert.equal(res[0], 1);
+
+    res = extract("x@Number", "12");
+    assert.equal(res, null);
+
+    res = extract("x, y, z", 1, 2, 3);
+    assert.ok(res[0] === 1 && res[1] === 2 && res[2] === 3);
+  });
 
 });
