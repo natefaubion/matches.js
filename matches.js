@@ -1104,7 +1104,7 @@
     
     // Sugar for creating a new pattern and immediately invoking it with arguments.
     // This just lets you put the arguments first instead of after the patterns.
-    function caseOf (/* args..., matcher */) {
+    function caseOf (/* ...args, matcher */) {
       var args = slice.call(arguments, 0, -1);
       var matcher = arguments[arguments.length - 1];
       var context = this === exports ? null : this;
@@ -1118,9 +1118,25 @@
       return pattern(matcher).apply(context, args);
     }
     
+    // Extract works similar to regular expression matching on strings. If the
+    // pattern fails to match, it returns null. If it is successful it will return 
+    // an array of extracted values.
+    function extract (/* pattern, ...args */) {
+      var args = slice.call(arguments, 1);
+      var context = this === exports ? null : this;
+      var matcher = pattern(arguments[0], retArgs).alt(retEmpty, retNull);
+      return matcher.apply(context, args);
+    }
+    
+    // Extract helpers
+    function retNull () { return null; }
+    function retArgs () { return slice.call(arguments, 0); }
+    function retEmpty () { return []; }
+    
     // Export
     exports.pattern = pattern;
     exports.caseOf = caseOf;
+    exports.extract = extract;
     exports.parser = parser;
     exports.compiler = compiler;
     exports.extractors = require("./runtime").extractors;
