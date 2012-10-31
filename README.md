@@ -289,12 +289,13 @@ var myfn = pattern({
 Usage
 -----
 
-Matches.js exports two functions, `pattern` and `caseOf`.
+Matches.js exports three functions, `pattern`, `caseOf`, and `extract`.
 
 ```js
 var matches = require("matches");
 var pattern = matches.pattern;
 var caseOf  = matches.caseOf;
+var extract = matches.extract;
 ```
 
 ### pattern(patternObj)
@@ -359,7 +360,7 @@ customPattern(54);
 customPattern(12);
 ```
 
-### caseOf(args..., patternObj)
+### caseOf(...args, patternObj)
 
 You can use `caseOf` to do ad-hoc pattern matching on objects. It's the same
 as immediately invoking a `pattern` function, but lets you put the arguments
@@ -375,6 +376,16 @@ var result = caseOf(42, {
 var result = pattern({
   // ...
 })(42);
+```
+
+### extract(patternStr, ...args)
+
+Use extract to pull values out of other values. It works much like `match` on
+strings. If there was a succesful match, it will return an array of extracted
+values. If the match failed, it will return `null`.
+
+```js
+var res = extract('[...{name}]', objArray);
 ```
 
 ### Combinators
