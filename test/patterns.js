@@ -11,7 +11,7 @@ suite("Patterns", function () {
   function notOK () { return false; }
 
   function single (pat, fn) { 
-    return pattern(pat, fn || OK).alt("_", notOK); 
+    return pattern(pat, fn || OK).alt("...", notOK); 
   }
 
   function testPattern (pat, val, fn) {
@@ -124,13 +124,39 @@ suite("Patterns", function () {
     }));
   });
 
+  // Rest Expressions
+  // ----------------
+  var rest1 = [1, 2, 3];
+  testPattern("[...Number]", rest1);
+
+  var rest2 = [{x: 1}, {x: 2}, {x: 3}];
+  testPattern("[...{x: _}]", rest2);
+  testPattern("[...{x}]", rest2, function (x) {
+    return x.length === 3 && x[0] === 1 && x[1] === 2 && x[2] === 3;
+  });
+
+  var rest3 = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+  testPattern("[...[...Number]]", rest3);
+  testPattern("[...[x, y, z]]", rest3, function (x, y, z) {
+    return x.length === 3 && x[0] === 1 && x[1] === 4 && x[2] === 7
+        && y.length === 3 && y[0] === 2 && y[1] === 5 && y[2] === 8
+        && z.length === 3 && z[0] === 3 && z[1] === 6 && z[2] === 9;
+  });
+
+  testPattern("[...[head, ...tail]]", rest3, function (h, t) {
+    return h.length === 3 && h[0] === 1 && h[1] === 4 && h[2] === 7
+        && t.length === 3
+        && t[0].length === 2 && t[0][0] === 2 && t[0][1] === 3
+        && t[1].length === 2 && t[1][0] === 5 && t[1][1] === 6
+        && t[2].length === 2 && t[2][0] === 8 && t[2][1] === 9;
+  });
+
   // Objects
   // -------
 
   testPattern("{}", {});
   testPattern("{a, b}", {a: 1, b: 2});
-  failPattern("{c, d}", {c: 1, e: 2});
-  failPattern("{e, f}", {e: 1, f: 2, g: 3});
+  testPattern("{e, f}", {e: 1, f: 2, g: 3});
 
   testPattern("{x, y}", {x: 1, y: 2}, function (x, y) {
     return x === 1 && y === 2;
@@ -146,46 +172,6 @@ suite("Patterns", function () {
 
   testPattern("{a, b:x}", {a: 1, b: 2}, function (a, x) {
     return a === 1 && x === 2;
-  });
-
-  testPattern("{a, b, ...}", {a: 1, b: 2, c: 3}, function (a, b) {
-    return a === 1 && b === 2;
-  });
-
-  testPattern("{a, b, ...c}", {a: 1, b: 2, c: 3}, function (a, b, c) {
-    return a === 1 
-        && b === 2
-        && c.c === 3
-        && c.a === undefined
-        && c.b === undefined;
-  });
-
-  testPattern("{a:x, b:y, ...}", {a: 1, b: 2, c: 3}, function (x, y) {
-    return x === 1 && y === 2;
-  });
-
-  testPattern("{a:x, b:y, ...c}", {a: 1, b: 2, c: 3}, function (x, y, c) {
-    return x === 1 
-        && y === 2
-        && c.c === 3
-        && c.a === undefined
-        && c.b === undefined;
-  });
-
-  testPattern("{...c, a:x, b:y}", {a: 1, b: 2, c: 3}, function (c, x, y) {
-    return x === 1 
-        && y === 2
-        && c.c === 3
-        && c.a === undefined
-        && c.b === undefined;
-  });
-  
-  testPattern("{a:x, ...c, b:y}", {a: 1, b: 2, c: 3}, function (x, c, y) {
-    return x === 1 
-        && y === 2
-        && c.c === 3
-        && c.a === undefined
-        && c.b === undefined;
   });
 
   testPattern("{'a b c':x}", {'a b c': 2}, function (x) {
@@ -232,13 +218,6 @@ suite("Patterns", function () {
   });
 
   testPattern("Bar{a: 1, b: 2, c: 3}", bar);
-  testPattern("Bar{a: 1, ...}", bar);
-  
-  testPattern("Bar{a: 1, ...b}", bar, function (b) {
-    return b.a === undefined
-        && b.b === 2
-        && b.c === 3;
-  });
 
   // Custom types
   // ------------
@@ -279,21 +258,5 @@ suite("Patterns", function () {
   });
 
   failPattern("$email(x)", "not an email");
-
-  // Edge cases
-  // ----------
-
-  // An instance with overriden object prototype methods.
-  // Issue #4: A pattern should have failed where it was succeeding because
-  // the prototype `toString` method of the lookup object was matching the
-  // `toString` method here. This was fixed by making the conditional that
-  // checked the lookup object use `hasOwnProperty` instead of an `in` check.
-  function OverrideProto () {
-    this.a = 1;
-    this.toString = function () { return ""; };
-  }
-
-  var op = new OverrideProto();
-  failPattern("{fail, ...}", op);
 
 });
