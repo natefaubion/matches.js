@@ -982,6 +982,7 @@
     var module = {exports: {}}, exports = module.exports;
     var parser = require("./parser");
     var compiler = require("./compiler");
+    var runtime = require("./runtime");
     var Matcher = require("./matcher").Matcher;
     
     // Cache slice
@@ -992,6 +993,21 @@
     
     // Internal cache of all unique, normalized patterns
     var normalized = {};
+    
+    // Retrieves a patternFn from the cache or compiles it if it's not there.
+    function getOrCompile (patternStr) {
+      var tree, fn;
+      if (!patterns.hasOwnProperty(patternStr)) {
+        tree = parser.parse(patternStr);
+        if (!normalized.hasOwnProperty(tree.pattern)) {
+          fn = compiler.compile(tree);
+          fn.pattern = tree.pattern;
+          normalized[tree.pattern] = fn;
+        }
+        patterns[patternStr] = normalized[tree.pattern];
+      }
+      return patterns[patternStr];
+    }
     
     // Creates a pattern matching function given a string and a fn to execute.
     function pattern () {
@@ -1047,30 +1063,7 @@
         patternStr = args[0];
         successFn = args[1];
         chain = args[2] ? args[2].clone() : null;
-    
-        // Check if we've already compiled the same patternStr before.
-        if (patternStr in patterns) {
-          patternFn = patterns[patternStr];
-        }
-    
-        else {
-          tree = parser.parse(patternStr);
-    
-          // Check if we've already compiled a pattern function for the normalized
-          // pattern. If so, just use that and don't bother compiling.
-          if (tree.pattern in normalized) {
-            patternFn = (patterns[patternStr] = normalized[tree.pattern]);
-          }
-    
-          // Compile the pattern function and cache it.
-          else {
-            patternFn = compiler.compile(tree);
-            patternFn.pattern = tree.pattern;
-            patterns[patternStr] = patternFn;
-            normalized[tree.pattern] = patternFn;
-          }
-        }
-    
+        patternFn = getOrCompile(patternStr);
         return matcher(patternFn, successFn, chain);
       }
     }
@@ -1124,8 +1117,14 @@
     function extract (/* pattern, ...args */) {
       var args = slice.call(arguments, 1);
       var context = this === exports ? null : this;
-      var matcher = pattern(arguments[0], retArgs).alt(retEmpty, retNull);
-      return matcher.apply(context, args);
+      var patternFn = getOrCompile(arguments[0]);
+      return patternFn.call(context, args, runtime) || null;
+    }
+    
+    // Like extract, but returns the first extracted value or null.
+    function extractOne (/* pattern, ...args */) {
+      var res = extract.apply(this, arguments);
+      return res === null ? null : res[0];
     }
     
     // Extract helpers
@@ -1137,9 +1136,10 @@
     exports.pattern = pattern;
     exports.caseOf = caseOf;
     exports.extract = extract;
+    exports.extractOne = extractOne;
     exports.parser = parser;
     exports.compiler = compiler;
-    exports.extractors = require("./runtime").extractors;
+    exports.extractors = runtime.extractors;
     return module.exports;
   })();
 

@@ -2,6 +2,7 @@ var matches = require("../lib/matches");
 var pattern = matches.pattern;
 var caseOf  = matches.caseOf;
 var extract = matches.extract;
+var extractOne = matches.extractOne;
 var Matcher = require("../lib/matcher").Matcher;
 var assert  = require("assert");
 
@@ -93,6 +94,13 @@ suite("Core", function () {
 
     res = extract("x, y, z", 1, 2, 3);
     assert.ok(res[0] === 1 && res[1] === 2 && res[2] === 3);
+  });
+
+  test("extractOne()", function () {
+    var obj = {some: {nested: {structure: 42}}};
+    var res = extractOne('{some: {nested: {structure: x}}}', obj);
+
+    assert.equal(res, obj.some.nested.structure);
   });
 
 });

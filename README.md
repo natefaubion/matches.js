@@ -289,13 +289,15 @@ var myfn = pattern({
 Usage
 -----
 
-Matches.js exports three functions, `pattern`, `caseOf`, and `extract`.
+Matches.js exports four functions, `pattern`, `caseOf`, `extract`, and
+`extractOne`.
 
 ```js
 var matches = require("matches");
 var pattern = matches.pattern;
 var caseOf  = matches.caseOf;
 var extract = matches.extract;
+var extractOne = matches.extractOne;
 ```
 
 ### pattern(patternObj)
@@ -387,6 +389,19 @@ values. If the match failed, it will return `null`.
 ```js
 var res = extract('[...{name}]', objArray);
 ```
+
+### extractOne(patternStr, ...args)
+
+This is like `extract` but returns the first value instead of an array. This
+works well for traversing a deep structure.
+
+```js
+var val = extractOne('{some: {nested: {structure: val}}}', obj);
+```
+
+*Note:* this will also return `null` on failure. So keep that in mind if `null`
+could be a valid value. It will be difficult to detect a failed match, but it
+usually will not matter.
 
 ### Combinators
 
