@@ -1127,11 +1127,6 @@
       return res === null ? null : res[0];
     }
     
-    // Extract helpers
-    function retNull () { return null; }
-    function retArgs () { return slice.call(arguments, 0); }
-    function retEmpty () { return []; }
-    
     // Export
     exports.pattern = pattern;
     exports.caseOf = caseOf;
