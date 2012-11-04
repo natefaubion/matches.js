@@ -1,9 +1,9 @@
-var matches = require("../lib/matches");
+var matches = require("../matches");
 var pattern = matches.pattern;
 var caseOf  = matches.caseOf;
 var extract = matches.extract;
 var extractOne = matches.extractOne;
-var Matcher = require("../lib/matcher").Matcher;
+var Matcher = matches.Matcher;
 var assert  = require("assert");
 
 suite("Core", function () {

@@ -1,4 +1,4 @@
-var matches = require("../lib/matches");
+var matches = require("../matches");
 var pattern = matches.pattern;
 var caseOf = matches.caseOf;
 var assert = require("assert");

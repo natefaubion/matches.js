@@ -1,4 +1,4 @@
-var Matcher = require("../lib/matcher").Matcher;
+var Matcher = require("../matches").Matcher;
 var assert  = require("assert");
 
 suite("Matcher", function () {
