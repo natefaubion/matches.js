@@ -1,5 +1,5 @@
 var Benchmark = require("benchmark");
-var pattern = require("../").pattern;
+var pattern = require("../matches").pattern;
 var suite = Benchmark.Suite();
 
 function ok () {
@@ -12,7 +12,7 @@ function ok () {
 var patternFn = pattern({
   '[]': ok,
   '[x]': ok,
-  '[head, tail...]': ok,
+  '[head, ...tail]': ok,
   '{x, y}': ok,
   'Number': ok
 });
@@ -42,8 +42,7 @@ var handwrittenFn = function (arg) {
     }
   }
   if (arg instanceof Object) {
-    var keys = Object.keys(arg);
-    if (keys.length === 2 && "x" in arg && "y" in arg) {
+    if ("x" in arg && "y" in arg) {
       return ok.call(this, arg.x, arg.y);
     }
   }

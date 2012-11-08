@@ -178,8 +178,8 @@ suite("Patterns", function () {
     return x === 2;
   })
 
-  // Captures
-  // --------
+  // Binders
+  // -------
 
   var arr = [1, 2, 3];
   testPattern("x@[head, ...tail]", arr, function (x, head, tail) {

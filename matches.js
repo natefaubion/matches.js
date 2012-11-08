@@ -4,6 +4,7 @@
 //
 // version : 0.5.0
 // author  : Nathan Faubion <nathan@n-son.com>
+// repo    : https://github.com/natefaubion/matches.js
 // license : MIT
 
 ;(function (window, module) {
@@ -262,7 +263,6 @@
       else syntaxError(inp, "Expected " + del2);
     }
   }
-  
   // Matches a comma separated list of tokens. Can take a callback to validate
   // the input on each iteration. Note: this always returns a list. The calling 
   // function should determine if an empty list is a syntax error or not.
@@ -571,14 +571,13 @@
   
   function compile (tree) {
     if (typeof tree === "string") tree = parse(tree);
-    var source = [
-      '  var ret = [];',
-      indent(2, compileArgumentList(tree)),
-      '  return ret;'
-    ];
 
     // Every compiled function gets called with a reference to the runtime.
-    return new Function(["args", "runt"], source.join('\n'));
+    return new Function(["args", "runt"], [
+      'var ret = [];',
+      compileArgumentList(tree),
+      'return ret;'
+    ].join('\n'));
   }
 
   // Mapping of node types to compiler functions
@@ -618,12 +617,12 @@
   }
   
   function compileIdentifier (argName) {
-    return 'ret.push(' + argName + ');';
+    return 'ret[ret.length] = ' + argName + ';';
   }
   
   function compileBinder (argName, node) {
     var source = [
-      'ret.push(' + argName + ');',
+      compileIdentifier(argName),
       compilePattern(argName, node.children[0])
     ];
     return source.join('\n');
@@ -638,8 +637,8 @@
   function compileArrayStrict (argName, node) {
     var arrLen = node.children.length;
     var source = [
-      'if (!(' + argName + ' instanceof Array) ||',
-      '    ' + argName + '.length !== ' + arrLen + ') return false;'
+      'if (!(' + argName + ' instanceof Array) || ' +
+        argName + '.length !== ' + arrLen + ') return false;'
     ];
   
     var i = 0, len = node.children.length, childArgName;
@@ -660,14 +659,14 @@
     var posName = argName + '_pos'; // Used for calculating the slice position
     var restName = argName + '_rest'; // Used for storing the rest
     var source = [
-      'if (!(' + argName + ' instanceof Array) ||',
-      '    ' + argName + '.length < ' + minLen + ') return false;',
+      'if (!(' + argName + ' instanceof Array) ||' +
+        argName + '.length < ' + minLen + ') return false;',
       'var ' + posName + ' = 0;',
       'var ' + restName + ';'
     ];
 
     var i = 0, len = node.children.length, childArgName, child, restType;
-    for (i; i < len; i++) {
+    for (; i < len; i++) {
       child = node.children[i];
       childArgName = argName + '_' + i;
   
@@ -709,7 +708,7 @@
 
       // Just stash slice if its an identifier.
       if (restType === "identifier") {
-        source.push('ret.push(' + restName + ');');
+        source.push(compileIdentifier(restName));
       }
 
       // No need to do anything for wildcards, otherwise compile the rest
@@ -737,7 +736,7 @@
 
       // If the child is just a key, stash it
       if (child.type === "key") {
-        source.push('ret.push(' + argName + '[' + child.value + ']);');
+        source.push(compileIdentifier(argName + '[' + child.value + ']'));
       }
 
       // If the child is a keyValue, perform further compilation.
@@ -763,8 +762,8 @@
       var compFn  = isArray ? compileArray : compileObject;
       var valsName = argName + '_vals';
       source.push(
-        'if (!' + argName + '.constructor || !',
-        '    ' + argName + '.constructor.' + unapply + ') return false;',
+        'if (!' + argName + '.constructor || ' +
+            '!' + argName + '.constructor.' + unapply + ') return false;',
         'var ' + valsName + ' = ' + argName + '.constructor.' + unapply + '(' + argName +');',
         compFn(valsName, node.children[0])
       );
@@ -853,7 +852,7 @@
     var count = 0, i = 0, len = node.children.length, type;
     for (; i < len; i++) {
       type = node.children[i].type;
-      if (type === "identifier" || type === "capture" || type === "key") count += 1;
+      if (type === "identifier" || type === "binder" || type === "key") count += 1;
       else count += countIdentifiers(node.children[i]);
     }
     return count;
@@ -1052,7 +1051,11 @@
     }
   
     var fn = function () {
-      var args = slice.call(arguments);
+      // This seems like an odd optimization, but manually copying the
+      // arguments object over to an array instead of calling `slice` can
+      // speed up dispatch time 2-3x.
+      var args = [], i = 0, len = arguments.length;
+      for (; i < len; i++) args[i] = arguments[i];
       return chain.match(args, this);
     };
   

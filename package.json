@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha -u tdd"
   },
-  "main": "./index.js",
+  "main": "./matches",
   "repository": {
     "type": "git",
     "url": "https://github.com/natefaubion/matches.js.git" 
