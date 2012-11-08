@@ -1,3 +1,14 @@
+## 0.5.0 (2012-11-7)
+
+* Added arbitrary rest expressions. You can combine an ellpsis with any other
+expression to map said expression over a list.
+* Removed strict object comparison. It just wasn't useful, it was brittle,
+and it didn't make sense when combined with rest expressions. Object are now
+always non-strict.
+* Added a couple more methods (`extract` and `extractOne`) for just doing
+destructuring rather than dispatch.
+* Consolidated the source code into one file.
+
 ## 0.4.0
 
 * Added rest arguments. Argument length matching is now strict.
