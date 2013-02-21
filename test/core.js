@@ -99,8 +99,10 @@ suite("Core", function () {
   test("extractOne()", function () {
     var obj = {some: {nested: {structure: 42}}};
     var res = extractOne('{some: {nested: {structure: x}}}', obj);
+    var res2 = extractOne('{some: {other: {structure: x}}}', obj);
 
     assert.equal(res, obj.some.nested.structure);
+    assert.equal(res2, void 0);
   });
 
 });

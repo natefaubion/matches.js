@@ -1,3 +1,8 @@
+## 0.5.1 (2013-2-21)
+
+* Made `extractOne` return `undefined` on failure.
+* Bump adt.js version and update docs.
+
 ## 0.5.0 (2012-11-7)
 
 * Added arbitrary rest expressions. You can combine an ellpsis with any other

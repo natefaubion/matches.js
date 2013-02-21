@@ -2,7 +2,7 @@
 // ----------
 // Powerful pattern matching for Javascript
 //
-// version : 0.5.0
+// version : 0.5.1
 // author  : Nathan Faubion <nathan@n-son.com>
 // repo    : https://github.com/natefaubion/matches.js
 // license : MIT
@@ -1095,10 +1095,10 @@
     return patternFn.call(context, args, runtime) || null;
   }
   
-  // Like extract, but returns the first extracted value or null.
+  // Like extract, but returns the first extracted value or undefined.
   function extractOne (/* pattern, ...args */) {
     var res = extract.apply(this, arguments);
-    return res === null ? null : res[0];
+    return res === null ? void 0 : res[0];
   }
 
   // Export

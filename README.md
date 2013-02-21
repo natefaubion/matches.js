@@ -237,7 +237,7 @@ var Tree = adt.data({
   Node  : adt.record("val", "left", "right")
 });
 
-var mytree = Tree.Node(12, Tree.Empty(), Tree.Node(42, Tree.Empty(), Tree.Empty()));
+var mytree = Tree.Node(12, Tree.Empty, Tree.Node(42, Tree.Empty, Tree.Empty);
 
 var myfn = pattern({
   // Match on an Empty tree node
@@ -399,9 +399,8 @@ works well for traversing a deep structure.
 var val = extractOne('{some: {nested: {structure: val}}}', obj);
 ```
 
-*Note:* this will also return `null` on failure. So keep that in mind if `null`
-could be a valid value. It will be difficult to detect a failed match, but it
-usually will not matter.
+*Note:* this will also return `undefined` on failure. So keep that in mind if 
+`undefined` could be a valid value.
 
 ### Combinators
 
