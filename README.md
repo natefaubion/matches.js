@@ -1,3 +1,8 @@
+Matches.js is deprecated. Please check out 
+[https://github.com/natefaubion/sparkler](Sparkler), a native pattern matching
+engine built using [https://github.com/mozilla/sweet.js](sweet.js) macros. It
+does everything matches.js does and more, except it isn't a hideous hack!
+
 matches.js
 ==========
 
